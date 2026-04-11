@@ -6,6 +6,9 @@ Cargo.lock
 # State file
 .rustlings-state.txt
 
+# Python
+__pycache__/
+
 # OS
 .DS_Store
 .direnv/
