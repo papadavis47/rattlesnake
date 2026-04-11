@@ -17,7 +17,6 @@ use crate::{
 };
 
 mod app_state;
-mod cargo_toml;
 mod cli;
 mod cmd;
 mod dev;
@@ -36,7 +35,7 @@ const CURRENT_FORMAT_VERSION: u8 = 1;
 fn main() -> Result<ExitCode> {
     let args = Args::parse();
 
-    if cfg!(not(debug_assertions)) && Path::new("dev/rustlings-repo.txt").exists() {
+    if cfg!(not(debug_assertions)) && Path::new("dev/rattlesnake-repo.txt").exists() {
         bail!("{OLD_METHOD_ERR}");
     }
 
@@ -187,24 +186,23 @@ fn main() -> Result<ExitCode> {
 }
 
 const OLD_METHOD_ERR: &str =
-    "You are trying to run Rustlings using the old method before version 6.
-The new method doesn't include cloning the Rustlings' repository.
+    "You are trying to run Rattlesnake using the old method before version 6.
+The new method doesn't include cloning the Rattlesnake repository.
 Please follow the instructions in `README.md`:
-https://github.com/rust-lang/rustlings#getting-started";
+https://github.com/papadavis47/rattlesnake#getting-started";
 
 const FORMAT_VERSION_HIGHER_ERR: &str =
     "The format version specified in the `info.toml` file is higher than the last one supported.
-It is possible that you have an outdated version of Rustlings.
-Try to install the latest Rustlings version first.";
+It is possible that you have an outdated version of Rattlesnake.
+Try to install the latest Rattlesnake version first.";
 
 const PRE_INIT_MSG: &str = r"
        Welcome to...
-                 _   _ _
-  _ __ _   _ ___| |_| (_)_ __   __ _ ___
- | '__| | | / __| __| | | '_ \ / _` / __|
- | |  | |_| \__ \ |_| | | | | | (_| \__ \
- |_|   \__,_|___/\__|_|_|_| |_|\__, |___/
-                               |___/
+    ____        __   __  __                         __       
+   / __ \____ _/ /_ / /_/ /__  ________  ____ _/ /__ ___ 
+  / /_/ / __ `/ __// __/ / _ \/ ___/ __ \/ __ `/ //_/ _ \
+ / _, _/ /_/ / /_  / /_/ /  __(__  ) / / / /_/ / ,< /  __/
+/_/ |_|\__,_/\__/  \__/_/\___/____/_/ /_/\__,_/_/|_|\___/ 
 
 The `exercises/` directory couldn't be found in the current directory.
-If you are just starting with Rustlings, run the command `rustlings init` to initialize it.";
+If you are just starting with Rattlesnake, run the command `rattlesnake init` to initialize it.";

@@ -1,8 +1,6 @@
 use anyhow::{Context, Result, bail};
-use serde::Deserialize;
 use std::{
     io::{Read, pipe},
-    path::PathBuf,
     process::{Command, Stdio},
 };
 
@@ -46,103 +44,76 @@ fn run_cmd(mut cmd: Command, description: &str, output: Option<&mut Vec<u8>>) ->
         .map(|status| status.success())
 }
 
-// Parses parts of the output of `cargo metadata`.
-#[derive(Deserialize)]
-struct CargoMetadata {
-    target_directory: PathBuf,
-}
-
-pub struct CmdRunner {
-    target_dir: PathBuf,
-}
+pub struct CmdRunner;
 
 impl CmdRunner {
     pub fn build() -> Result<Self> {
-        // Get the target directory from Cargo.
-        let metadata_output = Command::new("cargo")
-            .arg("metadata")
-            .arg("-q")
-            .arg("--format-version")
-            .arg("1")
-            .arg("--no-deps")
+        let status = Command::new("uv")
+            .arg("--version")
             .stdin(Stdio::null())
-            .stderr(Stdio::inherit())
-            .output()
-            .context(CARGO_METADATA_ERR)?;
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .context(UV_NOT_FOUND_ERR)?;
 
-        if !metadata_output.status.success() {
-            bail!("The command `cargo metadata …` failed. Are you in the `rustlings/` directory?");
+        if !status.success() {
+            bail!("The command `uv --version` failed. Is `uv` installed correctly?");
         }
 
-        let metadata: CargoMetadata = serde_json::de::from_slice(&metadata_output.stdout)
-            .context(
-                "Failed to read the field `target_directory` from the output of the command `cargo metadata …`",
-            )?;
-
-        Ok(Self {
-            target_dir: metadata.target_directory,
-        })
+        Ok(Self)
     }
 
-    pub fn cargo<'out>(
-        &self,
-        subcommand: &str,
-        bin_name: &str,
-        output: Option<&'out mut Vec<u8>>,
-    ) -> CargoSubcommand<'out> {
-        let mut cmd = Command::new("cargo");
-        cmd.arg(subcommand).arg("-q").arg("--bin").arg(bin_name);
-
-        // A hack to make `cargo run` work when developing Rustlings.
-        #[cfg(debug_assertions)]
-        cmd.arg("--manifest-path")
-            .arg("dev/Cargo.toml")
-            .arg("--target-dir")
-            .arg(&self.target_dir);
-
-        if output.is_some() {
-            cmd.arg("--color").arg("always");
-        }
-
-        CargoSubcommand { cmd, output }
-    }
-
+    /// Run a Python exercise file via `uv run python <exercise_path>`.
     /// The boolean in the returned `Result` is true if the command's exit status is success.
-    pub fn run_debug_bin(&self, bin_name: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
-        // 7 = "/debug/".len()
-        let mut bin_path =
-            PathBuf::with_capacity(self.target_dir.as_os_str().len() + 7 + bin_name.len());
-        bin_path.push(&self.target_dir);
-        bin_path.push("debug");
-        bin_path.push(bin_name);
+    pub fn run_python(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+        let mut cmd = Command::new("uv");
+        cmd.arg("run").arg("python").arg(exercise_path);
 
-        run_cmd(Command::new(&bin_path), &bin_path.to_string_lossy(), output)
-    }
-}
-
-pub struct CargoSubcommand<'out> {
-    cmd: Command,
-    output: Option<&'out mut Vec<u8>>,
-}
-
-impl CargoSubcommand<'_> {
-    pub fn args<'arg, I>(&mut self, args: I) -> &mut Self
-    where
-        I: IntoIterator<Item = &'arg str>,
-    {
-        self.cmd.args(args);
-        self
+        run_cmd(cmd, &format!("uv run python {exercise_path}"), output)
     }
 
+    /// Run pytest on a Python exercise file via `uv run pytest <exercise_path>`.
     /// The boolean in the returned `Result` is true if the command's exit status is success.
-    pub fn run(self, description: &str) -> Result<bool> {
-        run_cmd(self.cmd, description, self.output)
+    pub fn run_pytest(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+        let mut cmd = Command::new("uv");
+        cmd.arg("run")
+            .arg("pytest")
+            .arg(exercise_path)
+            .arg("-v")
+            .arg("--tb=short")
+            .arg("--color=always")
+            .arg("--no-header")
+            .arg("-q");
+
+        run_cmd(cmd, &format!("uv run pytest {exercise_path}"), output)
+    }
+
+    /// Run ruff linter on a Python exercise file via `uv run ruff check <exercise_path>`.
+    /// The boolean in the returned `Result` is true if the command's exit status is success.
+    pub fn run_ruff(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+        let mut cmd = Command::new("uv");
+        cmd.arg("run")
+            .arg("ruff")
+            .arg("check")
+            .arg(exercise_path)
+            .arg("--no-fix");
+
+        run_cmd(cmd, &format!("uv run ruff check {exercise_path}"), output)
+    }
+
+    /// Run ty type checker on a Python exercise file via `uv run ty check <exercise_path>`.
+    /// The boolean in the returned `Result` is true if the command's exit status is success.
+    pub fn run_ty(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+        let mut cmd = Command::new("uv");
+        cmd.arg("run").arg("ty").arg("check").arg(exercise_path);
+
+        run_cmd(cmd, &format!("uv run ty check {exercise_path}"), output)
     }
 }
 
-const CARGO_METADATA_ERR: &str = "Failed to run the command `cargo metadata …`
-Did you already install Rust?
-Try running `cargo --version` to diagnose the problem.";
+const UV_NOT_FOUND_ERR: &str = "Failed to run the command `uv --version`
+Did you already install uv?
+Try running `uv --version` to diagnose the problem.";
 
 #[cfg(test)]
 mod tests {

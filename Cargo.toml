@@ -22,8 +22,8 @@ serde = { version = "1", features = ["derive"] }
 toml = { version = "1", default-features = false, features = ["std", "parse", "serde"] }
 
 [package]
-name = "rustlings"
-description = "Small exercises to get you used to reading and writing Rust code!"
+name = "rattlesnake"
+description = "An interactive tool to learn intermediate and advanced Python"
 version.workspace = true
 authors.workspace = true
 repository.workspace = true

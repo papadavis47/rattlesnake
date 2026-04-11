@@ -3,7 +3,6 @@ use crossterm::{
     QueueableCommand,
     style::{Attribute, Color, ResetColor, SetAttribute, SetForegroundColor},
 };
-use serde::Deserialize;
 use std::{
     env::{current_dir, set_current_dir},
     fs::{self, create_dir},
@@ -13,124 +12,51 @@ use std::{
 };
 
 use crate::{
-    cargo_toml::updated_cargo_toml, embedded::EMBEDDED_FILES, exercise::RunnableExercise,
-    info_file::InfoFile, term::press_enter_prompt,
+    embedded::EMBEDDED_FILES, exercise::RunnableExercise, info_file::InfoFile,
+    term::press_enter_prompt,
 };
 
-#[derive(Deserialize)]
-struct CargoLocateProject<'a> {
-    #[serde(borrow)]
-    root: &'a Path,
-}
-
 pub fn init() -> Result<()> {
-    let rustlings_dir = Path::new("rustlings");
-    if rustlings_dir.exists() {
-        bail!(RUSTLINGS_DIR_ALREADY_EXISTS_ERR);
+    let rattlesnake_dir = Path::new("rattlesnake");
+    if rattlesnake_dir.exists() {
+        bail!(RATTLESNAKE_DIR_ALREADY_EXISTS_ERR);
     }
 
-    let locate_project_output = Command::new("cargo")
-        .arg("locate-project")
-        .arg("-q")
-        .arg("--workspace")
-        .stdin(Stdio::null())
-        .stderr(Stdio::null())
-        .output()
-        .context(
-            "Failed to run the command `cargo locate-project …`\n\
-             Did you already install Rust?\n\
-             Try running `cargo --version` to diagnose the problem.",
-        )?;
-
-    if !Command::new("cargo")
-        .arg("clippy")
+    if !Command::new("uv")
         .arg("--version")
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .status()
-        .context("Failed to run the command `cargo clippy --version`")?
+        .context("Failed to run the command `uv --version`")?
         .success()
     {
         bail!(
-            "Clippy, the official Rust linter, is missing.\n\
-             Please install it first before initializing Rustlings."
+            "uv is required. Install it from https://docs.astral.sh/uv/"
         )
     }
 
     let mut stdout = io::stdout().lock();
-    let mut init_git = true;
 
-    if locate_project_output.status.success() {
-        if Path::new("exercises").exists() && Path::new("solutions").exists() {
-            bail!(IN_INITIALIZED_DIR_ERR);
-        }
+    stdout.write_all(b"This command will create the directory `rattlesnake/` which will contain the exercises.\n\
+                       Press ENTER to continue ")?;
+    press_enter_prompt(&mut stdout)?;
 
-        let workspace_manifest =
-            serde_json::de::from_slice::<CargoLocateProject>(&locate_project_output.stdout)
-                .context(
-                    "Failed to read the field `root` from the output of `cargo locate-project …`",
-                )?
-                .root;
-
-        let workspace_manifest_content = fs::read_to_string(workspace_manifest)
-            .with_context(|| format!("Failed to read the file {}", workspace_manifest.display()))?;
-        if !workspace_manifest_content.contains("[workspace]")
-            && !workspace_manifest_content.contains("workspace.")
-        {
-            bail!(
-                "The current directory is already part of a Cargo project.\n\
-                 Please initialize Rustlings in a different directory"
-            );
-        }
-
-        stdout.write_all(b"This command will create the directory `rustlings/` as a member of this Cargo workspace.\n\
-                           Press ENTER to continue ")?;
-        press_enter_prompt(&mut stdout)?;
-
-        // Make sure "rustlings" is added to `workspace.members` by making
-        // Cargo initialize a new project.
-        let status = Command::new("cargo")
-            .arg("new")
-            .arg("-q")
-            .arg("--vcs")
-            .arg("none")
-            .arg("rustlings")
-            .stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .status()?;
-        if !status.success() {
-            bail!(
-                "Failed to initialize a new Cargo workspace member.\n\
-                 Please initialize Rustlings in a different directory"
-            );
-        }
-
-        stdout.write_all(b"The directory `rustlings` has been added to `workspace.members` in the `Cargo.toml` file of this Cargo workspace.\n")?;
-        fs::remove_dir_all(rustlings_dir)
-            .context("Failed to remove the temporary directory `rustlings/`")?;
-        init_git = false;
-    } else {
-        stdout.write_all(b"This command will create the directory `rustlings/` which will contain the exercises.\n\
-                           Press ENTER to continue ")?;
-        press_enter_prompt(&mut stdout)?;
-    }
-
-    create_dir(rustlings_dir).context("Failed to create the `rustlings/` directory")?;
-    set_current_dir(rustlings_dir)
-        .context("Failed to change the current directory to `rustlings/`")?;
+    create_dir(rattlesnake_dir).context("Failed to create the `rattlesnake/` directory")?;
+    set_current_dir(rattlesnake_dir)
+        .context("Failed to change the current directory to `rattlesnake/`")?;
 
     let info_file = InfoFile::parse()?;
     EMBEDDED_FILES
         .init_exercises_dir(&info_file.exercises)
-        .context("Failed to initialize the `rustlings/exercises` directory")?;
+        .context("Failed to initialize the `rattlesnake/exercises` directory")?;
 
     create_dir("solutions").context("Failed to create the `solutions/` directory")?;
     fs::write(
         "solutions/README.md",
         include_bytes!("../solutions/README.md"),
     )
-    .context("Failed to create the file rustlings/solutions/README.md")?;
+    .context("Failed to create the file rattlesnake/solutions/README.md")?;
     for dir in EMBEDDED_FILES.exercise_dirs {
         let mut dir_path = String::with_capacity(10 + dir.name.len());
         dir_path.push_str("solutions/");
@@ -144,32 +70,25 @@ pub fn init() -> Result<()> {
             .with_context(|| format!("Failed to create the file {solution_path}"))?;
     }
 
-    let current_cargo_toml = include_str!("../dev-Cargo.toml");
-    // Skip the first line (comment).
-    let newline_ind = current_cargo_toml
-        .as_bytes()
-        .iter()
-        .position(|c| *c == b'\n')
-        .context("The embedded `Cargo.toml` is empty or contains only one line")?;
-    let current_cargo_toml = current_cargo_toml
-        .get(newline_ind + 1..)
-        .context("The embedded `Cargo.toml` contains only one line")?;
-    let updated_cargo_toml = updated_cargo_toml(&info_file.exercises, current_cargo_toml, b"")
-        .context("Failed to generate `Cargo.toml`")?;
-    fs::write("Cargo.toml", updated_cargo_toml)
-        .context("Failed to create the file `rustlings/Cargo.toml`")?;
+    fs::write("pyproject.toml", PYPROJECT_TOML)
+        .context("Failed to create the file `rattlesnake/pyproject.toml`")?;
 
-    fs::write("rust-analyzer.toml", RUST_ANALYZER_TOML)
-        .context("Failed to create the file `rustlings/rust-analyzer.toml`")?;
+    fs::write(".python-version", "3.12\n")
+        .context("Failed to create the file `rattlesnake/.python-version`")?;
 
     fs::write(".gitignore", GITIGNORE)
-        .context("Failed to create the file `rustlings/.gitignore`")?;
+        .context("Failed to create the file `rattlesnake/.gitignore`")?;
 
-    create_dir(".vscode").context("Failed to create the directory `rustlings/.vscode`")?;
-    fs::write(".vscode/extensions.json", VS_CODE_EXTENSIONS_JSON)
-        .context("Failed to create the file `rustlings/.vscode/extensions.json`")?;
+    let uv_sync_status = Command::new("uv")
+        .arg("sync")
+        .stdin(Stdio::null())
+        .status()
+        .context("Failed to run `uv sync`")?;
+    if !uv_sync_status.success() {
+        bail!("Failed to run `uv sync` in the rattlesnake directory");
+    }
 
-    if init_git && let Ok(dir) = current_dir() {
+    if let Ok(dir) = current_dir() {
         let mut dir = dir.as_path();
 
         loop {
@@ -204,35 +123,44 @@ pub fn init() -> Result<()> {
     Ok(())
 }
 
-const INIT_SOLUTION_FILE: &[u8] = b"fn main() {
-    // DON'T EDIT THIS SOLUTION FILE!
-    // It will be automatically filled after you finish the exercise.
-}
+const INIT_SOLUTION_FILE: &[u8] = b"# DON'T EDIT THIS SOLUTION FILE!
+# It will be automatically filled after you finish the exercise.
 ";
 
-pub const RUST_ANALYZER_TOML: &[u8] = br#"check.command = "clippy"
-check.extraArgs = ["--profile", "test"]
-cargo.targetDir = true
+const PYPROJECT_TOML: &[u8] = br#"[project]
+name = "rattlesnake-exercises"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0",
+    "ruff>=0.11",
+    "ty>=0.0",
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["exercises"]
 "#;
 
-const GITIGNORE: &[u8] = b"Cargo.lock
-target/
-.vscode/
+const GITIGNORE: &[u8] = b".venv/
+__pycache__/
+*.pyc
+.rattlesnake-state.txt
 ";
 
-pub const VS_CODE_EXTENSIONS_JSON: &[u8] = br#"{"recommendations":["rust-lang.rust-analyzer"]}"#;
+const RATTLESNAKE_DIR_ALREADY_EXISTS_ERR: &str =
+    "A directory with the name `rattlesnake` already exists in the current directory.
+You probably already initialized Rattlesnake.
+Run `cd rattlesnake`
+Then run `rattlesnake` again";
 
-const IN_INITIALIZED_DIR_ERR: &str = "It looks like Rustlings is already initialized in this directory.
-
-If you already initialized Rustlings, run the command `rustlings` for instructions on getting started with the exercises.
-Otherwise, please run `rustlings init` again in a different directory.";
-
-const RUSTLINGS_DIR_ALREADY_EXISTS_ERR: &str =
-    "A directory with the name `rustlings` already exists in the current directory.
-You probably already initialized Rustlings.
-Run `cd rustlings`
-Then run `rustlings` again";
-
-const POST_INIT_MSG: &[u8] = b"Run `cd rustlings` to go into the generated directory.
-Then run `rustlings` to get started.
+const POST_INIT_MSG: &[u8] = b"Run `cd rattlesnake` to go into the generated directory.
+Then run `rattlesnake` to get started.
 ";

@@ -2,19 +2,17 @@ use anyhow::{Context, Error, Result, anyhow, bail};
 use std::{
     cmp::Ordering,
     collections::HashSet,
-    fs::{self, OpenOptions, read_dir},
+    fs::{OpenOptions, read_dir},
     io::{self, Read, Write},
     path::{Path, PathBuf},
-    process::{Command, Stdio},
     thread,
 };
 
 use crate::{
     CURRENT_FORMAT_VERSION,
-    cargo_toml::{BINS_BUFFER_CAPACITY, append_bins, bins_start_end_ind},
     cmd::CmdRunner,
     exercise::{OUTPUT_CAPACITY, RunnableExercise},
-    info_file::{ExerciseInfo, InfoFile},
+    info_file::InfoFile,
     term::ProgressCounter,
 };
 
@@ -24,36 +22,6 @@ const MAX_EXERCISE_NAME_LEN: usize = 32;
 // Find a char that isn't allowed in the exercise's `name` or `dir`.
 fn forbidden_char(input: &str) -> Option<char> {
     input.chars().find(|c| !c.is_alphanumeric() && *c != '_')
-}
-
-// Check that the `Cargo.toml` file is up-to-date.
-fn check_cargo_toml(
-    exercise_infos: &[ExerciseInfo],
-    cargo_toml_path: &str,
-    exercise_path_prefix: &[u8],
-) -> Result<()> {
-    let current_cargo_toml = fs::read_to_string(cargo_toml_path)
-        .with_context(|| format!("Failed to read the file `{cargo_toml_path}`"))?;
-
-    let (bins_start_ind, bins_end_ind) = bins_start_end_ind(&current_cargo_toml)?;
-
-    let old_bins = &current_cargo_toml.as_bytes()[bins_start_ind..bins_end_ind];
-    let mut new_bins = Vec::with_capacity(BINS_BUFFER_CAPACITY);
-    append_bins(&mut new_bins, exercise_infos, exercise_path_prefix);
-
-    if old_bins != new_bins {
-        if cfg!(debug_assertions) {
-            bail!(
-                "The file `dev/Cargo.toml` is outdated. Run `cargo dev update` to update it. Then run `cargo run -- dev check` again"
-            );
-        }
-
-        bail!(
-            "The file `Cargo.toml` is outdated. Run `rustlings dev update` to update it. Then run `rustlings dev check` again"
-        );
-    }
-
-    Ok(())
 }
 
 // Check the info of all exercises and return their paths in a set.
@@ -95,7 +63,7 @@ fn check_info_file_exercises(info_file: &InfoFile) -> Result<HashSet<PathBuf>> {
             bail!("The exercise name `{name}` is duplicated. Exercise names must all be unique");
         }
 
-        let path = exercise_info.path();
+        let path = exercise_info.exercise_path();
 
         OpenOptions::new()
             .read(true)
@@ -104,21 +72,14 @@ fn check_info_file_exercises(info_file: &InfoFile) -> Result<HashSet<PathBuf>> {
             .read_to_string(&mut file_buf)
             .with_context(|| format!("Failed to read the file {path}"))?;
 
-        if !file_buf.contains("fn main()") {
+        if !file_buf.contains("# TODO") {
             bail!(
-                "The `main` function is missing in the file `{path}`.\n\
-                 Create at least an empty `main` function to avoid language server errors"
-            );
-        }
-
-        if !file_buf.contains("// TODO") {
-            bail!(
-                "Didn't find any `// TODO` comment in the file `{path}`.\n\
+                "Didn't find any `# TODO` comment in the file `{path}`.\n\
                  You need to have at least one such comment to guide the user."
             );
         }
 
-        let contains_tests = file_buf.contains("#[test]\n");
+        let contains_tests = file_buf.contains("def test_");
         if exercise_info.test {
             if !contains_tests {
                 bail!(
@@ -127,7 +88,7 @@ fn check_info_file_exercises(info_file: &InfoFile) -> Result<HashSet<PathBuf>> {
             }
         } else if contains_tests {
             bail!(
-                "The file `{path}` contains tests annotated with `#[test]` but the exercise `{name}` has `test = false` in the `info.toml` file"
+                "The file `{path}` contains test functions but the exercise `{name}` has `test = false` in the `info.toml` file"
             );
         }
 
@@ -145,7 +106,7 @@ fn check_info_file_exercises(info_file: &InfoFile) -> Result<HashSet<PathBuf>> {
 fn check_unexpected_files(dir: &str, allowed_rust_files: &HashSet<PathBuf>) -> Result<()> {
     let unexpected_file = |path: &Path| {
         anyhow!(
-            "Found the file `{}`. Only `README.md` and Rust files related to an exercise in `info.toml` are allowed in the `{dir}` directory",
+            "Found the file `{}`. Only `README.md` and Python files related to an exercise in `info.toml` are allowed in the `{dir}` directory",
             path.display()
         )
     };
@@ -252,7 +213,7 @@ fn check_exercises(info_file: &'static InfoFile, cmd_runner: &'static CmdRunner)
         ),
         Ordering::Greater => bail!(
             "`format_version` > {CURRENT_FORMAT_VERSION} (supported version)\n\
-             Try updating the Rustlings program"
+             Try updating the Rattlesnake program"
         ),
         Ordering::Equal => (),
     }
@@ -311,14 +272,6 @@ fn check_solutions(
         .context("Failed to spawn a thread to check a solution")?;
 
     let mut sol_paths = HashSet::with_capacity(info_file.exercises.len());
-    let mut fmt_cmd = Command::new("rustfmt");
-    fmt_cmd
-        .arg("--check")
-        .arg("--edition")
-        .arg("2024")
-        .arg("--color")
-        .arg("always")
-        .stdin(Stdio::null());
 
     let mut progress_counter = ProgressCounter::new(&mut stdout, handles.len())?;
 
@@ -332,7 +285,6 @@ fn check_solutions(
 
         match check_result {
             SolutionCheck::Success { sol_path } => {
-                fmt_cmd.arg(&sol_path);
                 sol_paths.insert(PathBuf::from(sol_path));
             }
             SolutionCheck::MissingOptional => (),
@@ -350,21 +302,11 @@ fn check_solutions(
         progress_counter.increment()?;
     }
 
-    let n_solutions = sol_paths.len();
     let handle = thread::Builder::new()
         .spawn(move || check_unexpected_files("solutions", &sol_paths))
         .context(
             "Failed to spawn a thread to check for unexpected files in the solutions directory",
         )?;
-
-    if n_solutions > 0
-        && !fmt_cmd
-            .status()
-            .context("Failed to run `rustfmt` on all solution files")?
-            .success()
-    {
-        bail!("Some solutions aren't formatted. Run `rustfmt` on them");
-    }
 
     handle.join().unwrap()
 }
@@ -374,13 +316,6 @@ pub fn check(require_solutions: bool) -> Result<()> {
 
     if info_file.exercises.len() > MAX_N_EXERCISES {
         bail!("The maximum number of exercises is {MAX_N_EXERCISES}");
-    }
-
-    if cfg!(debug_assertions) {
-        // A hack to make `cargo dev check` work when developing Rustlings.
-        check_cargo_toml(&info_file.exercises, "dev/Cargo.toml", b"../")?;
-    } else {
-        check_cargo_toml(&info_file.exercises, "Cargo.toml", b"")?;
     }
 
     // Leaking is fine since they are used until the end of the program.

@@ -23,7 +23,7 @@ use crate::{
     term::{self, CheckProgressVisualizer},
 };
 
-const STATE_FILE_NAME: &str = ".rustlings-state.txt";
+const STATE_FILE_NAME: &str = ".rattlesnake-state.txt";
 const DEFAULT_CHECK_PARALLELISM: usize = 8;
 
 #[must_use]
@@ -104,7 +104,7 @@ impl AppState {
 
                     canonical_path.push_str(MAIN_SEPARATOR_STR);
                     canonical_path.push_str(exercise_info.name);
-                    canonical_path.push_str(".rs");
+                    canonical_path.push_str(".py");
                     canonical_path
                 });
 
@@ -113,10 +113,11 @@ impl AppState {
                     dir: exercise_info.dir,
                     // Leaking for `Editor::open`.
                     // Leaking is fine since the app state exists until the end of the program.
-                    path: exercise_info.path().leak(),
+                    path: exercise_info.exercise_path().leak(),
                     canonical_path,
                     test: exercise_info.test,
-                    strict_clippy: exercise_info.strict_clippy,
+                    type_check: exercise_info.type_check,
+                    lint: exercise_info.lint,
                     hint: exercise_info.hint.trim_ascii(),
                     // Updated below.
                     done: false,
@@ -584,24 +585,23 @@ impl AppState {
 const BAD_INDEX_ERR: &str = "The current exercise index is higher than the number of exercises";
 const STATE_FILE_HEADER: &[u8] = b"DON'T EDIT THIS FILE!\n\n";
 const FENISH_LINE: &str = "+----------------------------------------------------+
-|          You made it to the Fe-nish line!          |
+|        You conquered the Rattlesnake! 🐍           |
 +--------------------------  ------------------------+
-                           \\/\x1b[31m
-     ▒▒          ▒▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒          ▒▒
-   ▒▒▒▒  ▒▒    ▒▒        ▒▒  ▒▒        ▒▒    ▒▒  ▒▒▒▒
-   ▒▒▒▒  ▒▒  ▒▒            ▒▒            ▒▒  ▒▒  ▒▒▒▒
- ░░▒▒▒▒░░▒▒  ▒▒            ▒▒            ▒▒  ▒▒░░▒▒▒▒
-   ▓▓▓▓▓▓▓▓  ▓▓      ▓▓██  ▓▓  ▓▓██      ▓▓  ▓▓▓▓▓▓▓▓
-     ▒▒▒▒    ▒▒      ████  ▒▒  ████      ▒▒░░  ▒▒▒▒
-       ▒▒  ▒▒▒▒▒▒        ▒▒▒▒▒▒        ▒▒▒▒▒▒  ▒▒
-         ▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▒▒▒▒▒▒▒▒▓▓▓▓▓▓▒▒▒▒▒▒▒▒
-           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-             ▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▒▒██▒▒▒▒▒▒▒▒▒▒
-           ▒▒  ▒▒▒▒▒▒▒▒▒▒██████▒▒▒▒▒▒▒▒▒▒  ▒▒
-         ▒▒    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    ▒▒
-       ▒▒    ▒▒    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    ▒▒    ▒▒
-       ▒▒  ▒▒    ▒▒                  ▒▒    ▒▒  ▒▒
-           ▒▒  ▒▒                      ▒▒  ▒▒\x1b[0m
+                           \\/\x1b[32m
+                       _    _
+                      | \\  / |
+                       \\ \\/ /
+                        \\  /
+                    _.---'  '---._
+                   /    \\    /    \\
+                  |  ()  \\  /  ()  |
+                   \\      \\/      /
+                    '-.________.-'
+                        |    |
+                       /      \\
+                      /  ~~~~  \\
+                     /  ~~~~~~  \\
+                    '____________'\x1b[0m
 
 ";
 
@@ -613,10 +613,11 @@ mod tests {
         Exercise {
             name: "0",
             dir: None,
-            path: "exercises/0.rs",
+            path: "exercises/0.py",
             canonical_path: None,
             test: false,
-            strict_clippy: false,
+            type_check: false,
+            lint: false,
             hint: "",
             done: false,
         }

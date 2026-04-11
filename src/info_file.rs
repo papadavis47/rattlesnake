@@ -11,12 +11,15 @@ pub struct ExerciseInfo {
     pub name: &'static str,
     /// Exercise's directory name inside the `exercises/` directory.
     pub dir: Option<&'static str>,
-    /// Run `cargo test` on the exercise.
+    /// Run pytest on the exercise.
     #[serde(default = "default_true")]
     pub test: bool,
-    /// Deny all Clippy warnings.
+    /// Run type checking on the exercise.
     #[serde(default)]
-    pub strict_clippy: bool,
+    pub type_check: bool,
+    /// Run linting on the exercise.
+    #[serde(default = "default_true")]
+    pub lint: bool,
     /// The exercise's hint to be shown to the user on request.
     pub hint: &'static str,
     /// The exercise is already solved. Ignore it when checking that all exercises are unsolved.
@@ -25,32 +28,6 @@ pub struct ExerciseInfo {
 }
 const fn default_true() -> bool {
     true
-}
-
-impl ExerciseInfo {
-    /// Path to the exercise file starting with the `exercises/` directory.
-    pub fn path(&self) -> String {
-        let mut path = if let Some(dir) = self.dir {
-            // 14 = 10 + 1 + 3
-            // exercises/ + / + .rs
-            let mut path = String::with_capacity(14 + dir.len() + self.name.len());
-            path.push_str("exercises/");
-            path.push_str(dir);
-            path.push('/');
-            path
-        } else {
-            // 13 = 10 + 3
-            // exercises/ + .rs
-            let mut path = String::with_capacity(13 + self.name.len());
-            path.push_str("exercises/");
-            path
-        };
-
-        path.push_str(self.name);
-        path.push_str(".rs");
-
-        path
-    }
 }
 
 impl RunnableExercise for ExerciseInfo {
@@ -62,8 +39,12 @@ impl RunnableExercise for ExerciseInfo {
         self.dir
     }
 
-    fn strict_clippy(&self) -> bool {
-        self.strict_clippy
+    fn type_check(&self) -> bool {
+        self.type_check
+    }
+
+    fn lint(&self) -> bool {
+        self.lint
     }
 
     fn test(&self) -> bool {

@@ -6,7 +6,7 @@ use std::{
     process::Command,
 };
 
-use crate::{CURRENT_FORMAT_VERSION, init::RUST_ANALYZER_TOML};
+use crate::CURRENT_FORMAT_VERSION;
 
 // Create a directory relative to the current directory and print its path.
 fn create_rel_dir(dir_name: &str, current_dir: &str) -> Result<()> {
@@ -60,89 +60,81 @@ pub fn new(path: &Path, no_git: bool) -> Result<()> {
         ),
     )?;
 
-    write_rel_file("Cargo.toml", &dir_path_str, CARGO_TOML)?;
+    write_rel_file("pyproject.toml", &dir_path_str, PYPROJECT_TOML)?;
 
     write_rel_file("README.md", &dir_path_str, README)?;
-
-    write_rel_file("rust-analyzer.toml", &dir_path_str, RUST_ANALYZER_TOML)?;
-
-    create_rel_dir(".vscode", &dir_path_str)?;
-    write_rel_file(
-        ".vscode/extensions.json",
-        &dir_path_str,
-        crate::init::VS_CODE_EXTENSIONS_JSON,
-    )?;
 
     println!("\nInitialization done ✓");
 
     Ok(())
 }
 
-pub const GITIGNORE: &[u8] = b"Cargo.lock
-target/
-.vscode/
-!.vscode/extensions.json
+pub const GITIGNORE: &[u8] = b".venv/
+__pycache__/
+*.pyc
+.rattlesnake-state.txt
 ";
 
 const INFO_FILE_BEFORE_FORMAT_VERSION: &str =
     "# The format version is an indicator of the compatibility of community exercises with the
-# Rustlings program.
-# The format version is not the same as the version of the Rustlings program.
-# In case Rustlings makes an unavoidable breaking change to the expected format of community
+# Rattlesnake program.
+# The format version is not the same as the version of the Rattlesnake program.
+# In case Rattlesnake makes an unavoidable breaking change to the expected format of community
 # exercises, you would need to raise this version and adapt to the new format.
-# Otherwise, the newest version of the Rustlings program won't be able to run these exercises.
+# Otherwise, the newest version of the Rattlesnake program won't be able to run these exercises.
 format_version = ";
 
 const INFO_FILE_AFTER_FORMAT_VERSION: &str = r#"
 
 # Optional multi-line message to be shown to users when just starting with the exercises.
-welcome_message = """Welcome to these community Rustlings exercises."""
+welcome_message = """Welcome to these community Rattlesnake exercises."""
 
 # Optional multi-line message to be shown to users after finishing all exercises.
 final_message = """We hope that you found the exercises helpful :D"""
 
 # Repeat this section for every exercise.
 [[exercises]]
-# Exercise name which is the exercise file name without the `.rs` extension.
+# Exercise name which is the exercise file name without the `.py` extension.
 name = "???"
 
 # Optional directory name to be provided if you want to organize exercises in directories.
-# If `dir` is specified, the exercise path is `exercises/DIR/NAME.rs`
-# Otherwise, the path is `exercises/NAME.rs`
+# If `dir` is specified, the exercise path is `exercises/DIR/NAME.py`
+# Otherwise, the path is `exercises/NAME.py`
 # dir = "???"
 
-# Rustlings expects the exercise to contain tests and run them.
+# Rattlesnake expects the exercise to contain tests and run them.
 # You can optionally disable testing by setting `test` to `false` (the default is `true`).
-# In that case, the exercise will be considered done when it just successfully compiles.
+# In that case, the exercise will be considered done when it just runs successfully.
 # test = true
 
-# Rustlings will always run Clippy on exercises.
-# You can optionally set `strict_clippy` to `true` (the default is `false`) to only consider
-# the exercise as done when there are no warnings left.
-# strict_clippy = false
+# Run type checking on the exercise (default is `false`).
+# type_check = false
+
+# Run linting on the exercise (default is `true`).
+# lint = true
 
 # A multi-line hint to be shown to users on request.
 hint = """???"""
 "#;
 
-const CARGO_TOML: &[u8] =
-    br#"# Don't edit the `bin` list manually! It is updated by `rustlings dev update`
-bin = []
+const PYPROJECT_TOML: &[u8] = br#"[project]
+name = "rattlesnake-exercises"
+version = "0.1.0"
+requires-python = ">=3.12"
 
-[package]
-name = "exercises"
-edition = "2024"
-# Don't publish the exercises on crates.io!
-publish = false
-
-[dependencies]
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0",
+    "ruff>=0.11",
+    "ty>=0.0",
+]
 "#;
 
-const README: &str = "# Rustlings 🦀
+const README: &str = "# Rattlesnake 🐍
 
-Welcome to these community Rustlings exercises 😃
+Welcome to these community Rattlesnake exercises 😃
 
-First, [install Rustlings using the official instructions](https://github.com/rust-lang/rustlings) ✅
+First, [install Rattlesnake using the official instructions](https://github.com/papadavis47/rattlesnake) ✅
 
-Then, clone this repository, open a terminal in this directory and run `rustlings` to get started with the exercises 🚀
+Then, clone this repository, open a terminal in this directory and run `rattlesnake` to get started with the exercises 🚀
 ";

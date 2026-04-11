@@ -32,38 +32,6 @@ pub fn solution_link_line(
     stdout.write_all(b"\n")
 }
 
-// Run an exercise binary and append its output to the `output` buffer.
-// Compilation must be done before calling this method.
-fn run_bin(
-    bin_name: &str,
-    mut output: Option<&mut Vec<u8>>,
-    cmd_runner: &CmdRunner,
-) -> Result<bool> {
-    if let Some(output) = output.as_deref_mut() {
-        write_ansi(output, SetAttribute(Attribute::Underlined));
-        output.extend_from_slice(b"Output");
-        write_ansi(output, ResetColor);
-        output.push(b'\n');
-    }
-
-    let success = cmd_runner.run_debug_bin(bin_name, output.as_deref_mut())?;
-
-    if let Some(output) = output
-        && !success
-    {
-        // This output is important to show the user that something went wrong.
-        // Otherwise, calling something like `exit(1)` in an exercise without further output
-        // leaves the user confused about why the exercise isn't done yet.
-        write_ansi(output, SetAttribute(Attribute::Bold));
-        write_ansi(output, SetForegroundColor(Color::Red));
-        output.extend_from_slice(b"The exercise didn't run successfully (nonzero exit code)");
-        write_ansi(output, ResetColor);
-        output.push(b'\n');
-    }
-
-    Ok(success)
-}
-
 /// See `info_file::ExerciseInfo`
 pub struct Exercise {
     pub name: &'static str,
@@ -72,7 +40,8 @@ pub struct Exercise {
     pub path: &'static str,
     pub canonical_path: Option<String>,
     pub test: bool,
-    pub strict_clippy: bool,
+    pub type_check: bool,
+    pub lint: bool,
     pub hint: &'static str,
     pub done: bool,
 }
@@ -96,14 +65,40 @@ impl Exercise {
 pub trait RunnableExercise {
     fn name(&self) -> &str;
     fn dir(&self) -> Option<&str>;
-    fn strict_clippy(&self) -> bool;
     fn test(&self) -> bool;
+    fn type_check(&self) -> bool;
+    fn lint(&self) -> bool;
 
-    // Compile, check and run the exercise or its solution (depending on `bin_name´).
-    // The output is written to the `output` buffer after clearing it.
-    fn run<const FORCE_STRICT_CLIPPY: bool>(
+    fn exercise_path(&self) -> String {
+        let name = self.name();
+
+        let mut path = if let Some(dir) = self.dir() {
+            // 14 = 10 + 1 + 3
+            // exercises/ + / + .py
+            let mut path = String::with_capacity(14 + dir.len() + name.len());
+            path.push_str("exercises/");
+            path.push_str(dir);
+            path.push('/');
+            path
+        } else {
+            // 13 = 10 + 3
+            // exercises/ + .py
+            let mut path = String::with_capacity(13 + name.len());
+            path.push_str("exercises/");
+            path
+        };
+
+        path.push_str(name);
+        path.push_str(".py");
+
+        path
+    }
+
+    /// Run the exercise and optionally its tests, linter, and type checker.
+    /// The output is written to the `output` buffer after clearing it.
+    fn run_exercise_at(
         &self,
-        bin_name: &str,
+        exercise_path: &str,
         mut output: Option<&mut Vec<u8>>,
         cmd_runner: &CmdRunner,
     ) -> Result<bool> {
@@ -111,66 +106,58 @@ pub trait RunnableExercise {
             output.clear();
         }
 
-        let build_success = cmd_runner
-            .cargo("build", bin_name, output.as_deref_mut())
-            .run("cargo build …")?;
-        if !build_success {
+        // 1. Run the Python exercise file.
+        let run_success = cmd_runner.run_python(exercise_path, output.as_deref_mut())?;
+        if !run_success {
+            if let Some(output) = output {
+                write_ansi(output, SetAttribute(Attribute::Bold));
+                write_ansi(output, SetForegroundColor(Color::Red));
+                output.extend_from_slice(b"The exercise didn't run successfully (nonzero exit code)");
+                write_ansi(output, ResetColor);
+                output.push(b'\n');
+            }
             return Ok(false);
         }
 
-        // Discard the compiler output because it will be shown again by `cargo test` or Clippy.
-        if let Some(output) = output.as_deref_mut() {
-            output.clear();
-        }
-
+        // 2. Run pytest if test=true.
         if self.test() {
-            let output_is_some = output.is_some();
-            let mut test_cmd = cmd_runner.cargo("test", bin_name, output.as_deref_mut());
-            if output_is_some {
-                test_cmd.args(["--", "--color", "always", "--format", "pretty"]);
-            }
-            let test_success = test_cmd.run("cargo test …")?;
+            let test_success = cmd_runner.run_pytest(exercise_path, output.as_deref_mut())?;
             if !test_success {
-                run_bin(bin_name, output, cmd_runner)?;
                 return Ok(false);
             }
+        }
 
-            // Discard the compiler output because it will be shown again by Clippy.
-            if let Some(output) = output.as_deref_mut() {
-                output.clear();
+        // 3. Run ruff if lint=true.
+        if self.lint() {
+            let lint_success = cmd_runner.run_ruff(exercise_path, output.as_deref_mut())?;
+            if !lint_success {
+                return Ok(false);
             }
         }
 
-        let mut clippy_cmd = cmd_runner.cargo("clippy", bin_name, output.as_deref_mut());
-
-        // `--profile test` is required to also check code with `#[cfg(test)]`.
-        if FORCE_STRICT_CLIPPY || self.strict_clippy() {
-            clippy_cmd.args(["--profile", "test", "--", "-D", "warnings"]);
-        } else {
-            clippy_cmd.args(["--profile", "test"]);
+        // 4. Run ty if type_check=true.
+        if self.type_check() {
+            let type_success = cmd_runner.run_ty(exercise_path, output.as_deref_mut())?;
+            if !type_success {
+                return Ok(false);
+            }
         }
 
-        let clippy_success = clippy_cmd.run("cargo clippy …")?;
-        let run_success = run_bin(bin_name, output, cmd_runner)?;
-
-        Ok(clippy_success && run_success)
+        Ok(true)
     }
 
-    /// Compile, check and run the exercise.
+    /// Run the exercise.
     /// The output is written to the `output` buffer after clearing it.
     fn run_exercise(&self, output: Option<&mut Vec<u8>>, cmd_runner: &CmdRunner) -> Result<bool> {
-        self.run::<false>(self.name(), output, cmd_runner)
+        let path = self.exercise_path();
+        self.run_exercise_at(&path, output, cmd_runner)
     }
 
-    /// Compile, check and run the exercise's solution.
+    /// Run the exercise's solution.
     /// The output is written to the `output` buffer after clearing it.
     fn run_solution(&self, output: Option<&mut Vec<u8>>, cmd_runner: &CmdRunner) -> Result<bool> {
-        let name = self.name();
-        let mut bin_name = String::with_capacity(name.len() + 4);
-        bin_name.push_str(name);
-        bin_name.push_str("_sol");
-
-        self.run::<true>(&bin_name, output, cmd_runner)
+        let path = self.sol_path();
+        self.run_exercise_at(&path, output, cmd_runner)
     }
 
     fn sol_path(&self) -> String {
@@ -178,7 +165,7 @@ pub trait RunnableExercise {
 
         let mut path = if let Some(dir) = self.dir() {
             // 14 = 10 + 1 + 3
-            // solutions/ + / + .rs
+            // solutions/ + / + .py
             let mut path = String::with_capacity(14 + dir.len() + name.len());
             path.push_str("solutions/");
             path.push_str(dir);
@@ -186,14 +173,14 @@ pub trait RunnableExercise {
             path
         } else {
             // 13 = 10 + 3
-            // solutions/ + .rs
+            // solutions/ + .py
             let mut path = String::with_capacity(13 + name.len());
             path.push_str("solutions/");
             path
         };
 
         path.push_str(name);
-        path.push_str(".rs");
+        path.push_str(".py");
 
         path
     }
@@ -208,11 +195,15 @@ impl RunnableExercise for Exercise {
         self.dir
     }
 
-    fn strict_clippy(&self) -> bool {
-        self.strict_clippy
-    }
-
     fn test(&self) -> bool {
         self.test
+    }
+
+    fn type_check(&self) -> bool {
+        self.type_check
+    }
+
+    fn lint(&self) -> bool {
+        self.lint
     }
 }

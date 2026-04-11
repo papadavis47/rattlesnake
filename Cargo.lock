@@ -452,6 +452,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
+name = "rattlesnake"
+version = "6.5.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "crossterm",
+ "notify",
+ "rustix",
+ "rustlings-macros",
+ "serde",
+ "serde_json",
+ "shlex",
+ "tempfile",
+ "toml",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.5.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -471,23 +488,6 @@ dependencies = [
  "libc",
  "linux-raw-sys",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "rustlings"
-version = "6.5.0"
-dependencies = [
- "anyhow",
- "clap",
- "crossterm",
- "notify",
- "rustix",
- "rustlings-macros",
- "serde",
- "serde_json",
- "shlex",
- "tempfile",
- "toml",
 ]
 
 [[package]]
