@@ -3,17 +3,21 @@ format_version = 1
 [[exercises]]
 name = "compilation_success"
 test = false
+lint = false
 hint = ""
 
 [[exercises]]
 name = "compilation_failure"
 test = false
+lint = false
 hint = ""
 
 [[exercises]]
 name = "test_success"
+lint = false
 hint = ""
 
 [[exercises]]
 name = "test_failure"
+lint = false
 hint = "The answer to everything: 42"

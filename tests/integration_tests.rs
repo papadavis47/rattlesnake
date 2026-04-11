@@ -35,7 +35,7 @@ impl<'a> Cmd<'a> {
 
     #[track_caller]
     fn assert(&self, success: bool) {
-        let mut cmd = Command::new(env!("CARGO_BIN_EXE_rustlings"));
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_rattlesnake"));
 
         if let Some(current_dir) = self.current_dir {
             cmd.current_dir(current_dir);
@@ -145,10 +145,10 @@ fn init() {
     Cmd::default()
         .current_dir(test_dir)
         .args(&["init"])
-        .output(PartialStderr("`cd rustlings`"))
+        .output(PartialStderr("`cd rattlesnake`"))
         .fail();
 
-    let initialized_dir = format!("{test_dir}/rustlings");
+    let initialized_dir = format!("{test_dir}/rattlesnake");
 
     // Running `init` in the initialized directory.
     Cmd::default()

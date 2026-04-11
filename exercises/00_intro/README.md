@@ -1,8 +1,6 @@
-# Intro
+# Introduction
 
-Rust uses the `print!` and `println!` macros to print text to the console.
+Welcome to Rattlesnake! 🐍
 
-## Further information
-
-- [Hello World](https://doc.rust-lang.org/rust-by-example/hello.html)
-- [Formatted print](https://doc.rust-lang.org/rust-by-example/hello/print.html)
+These exercises will help you master intermediate and advanced Python concepts.
+Each exercise contains a `# TODO` comment that tells you what to fix or implement.
