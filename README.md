@@ -16,8 +16,8 @@ the curriculum and validation pipeline with Python.
 
 ## What You Get
 
-- **32 hands-on exercises** with matching reference solutions
-- A gentle 10-exercise introduction for learners new to Python
+- **50 hands-on exercises** with matching reference solutions
+- A gentle 11-exercise introduction for learners new to Python
 - Automatic reruns whenever you save the current exercise
 - Built-in hints, progress tracking, exercise reset, and check-all commands
 - Validation powered by [`uv`](https://docs.astral.sh/uv/),

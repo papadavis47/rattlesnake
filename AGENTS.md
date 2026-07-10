@@ -57,34 +57,35 @@ Each exercise goes through up to 4 stages (configurable per-exercise in `info.to
 - **`tests/integration_tests.rs`** — Updated binary name reference, directory names.
 - **`tests/test_exercises/`** — Converted from Rust to Python exercise files.
 
-### Exercise Content (Phase 5 — 32 Exercises ✅)
+### Exercise Content (Phase 5 — 50 Exercises ✅)
 
-The current curriculum has 32 exercises across 18 sections, with a matching
+The current curriculum has 50 exercises across 19 sections, with a matching
 file in `solutions/` for every exercise:
 
 | Section                        | Exercises                                      |
 |--------------------------------|------------------------------------------------|
-| `00_basics`                    | `basics1.py` through `basics10.py`             |
+| `00_basics`                    | `basics1.py` through `basics11.py`             |
 | `00_intro`                     | `intro1.py`, `intro2.py`                       |
-| `01_type_hints`                | `type_hints1.py`, `type_hints2.py`             |
-| `02_data_structures`           | `data_structures1.py`                          |
-| `03_comprehensions`            | `comprehensions1.py`                           |
-| `04_decorators`                | `decorators1.py`                               |
-| `05_context_managers`          | `context_managers1.py`, `context_managers2.py` |
-| `06_oop`                       | `oop1.py`, `oop2.py`                           |
-| `07_iterators_generators`      | `iterators1.py`, `iterators2.py`               |
-| `08_descriptors_properties`    | `properties1.py`                               |
-| `09_error_handling`            | `error_handling1.py`                           |
-| `10_concurrency`               | `concurrency1.py`                              |
-| `11_async`                     | `async1.py`                                    |
-| `12_testing`                   | `testing1.py`                                  |
-| `13_functools_closures`        | `functools1.py`                                |
-| `14_pattern_matching`          | `pattern_matching1.py`                         |
-| `15_metaclasses`               | `metaclasses1.py`                              |
-| `16_protocols_abcs`            | `protocols1.py`                                |
+| `01_type_hints`                | `type_hints1.py` through `type_hints3.py`      |
+| `02_data_structures`           | `data_structures1.py`, `data_structures2.py`   |
+| `03_comprehensions`            | `comprehensions1.py`, `comprehensions2.py`     |
+| `04_decorators`                | `decorators1.py`, `decorators2.py`             |
+| `05_context_managers`          | `context_managers1.py` through `context_managers3.py` |
+| `06_oop`                       | `oop1.py` through `oop3.py`                    |
+| `07_iterators_generators`      | `iterators1.py` through `iterators3.py`        |
+| `08_descriptors_properties`    | `properties1.py`, `descriptors1.py`            |
+| `09_error_handling`            | `error_handling1.py`, `error_handling2.py`     |
+| `10_concurrency`               | `concurrency1.py`, `concurrency2.py`           |
+| `11_async`                     | `async1.py`, `async2.py`                       |
+| `12_testing`                   | `testing1.py`, `testing2.py`                   |
+| `13_functools_closures`        | `functools1.py`, `functools2.py`               |
+| `14_pattern_matching`          | `pattern_matching1.py`, `pattern_matching2.py` |
+| `15_metaclasses`               | `metaclasses1.py`, `metaclasses2.py`           |
+| `16_protocols_abcs`            | `protocols1.py`, `protocols2.py`               |
+| `17_packaging`                 | `packaging1.py`                                |
 
 Exercise order and configuration are defined in `rustlings-macros/info.toml`,
-not by directory name. The 10 beginner exercises are presented first, followed
+not by directory name. The 11 beginner exercises are presented first, followed
 by the workflow checkpoint and the intermediate-to-advanced curriculum. Every
 exercise has an inline hint in `info.toml` and a corresponding solution.
 
@@ -92,7 +93,7 @@ exercise has an inline hint in `info.toml` and a corresponding solution.
 
 ✅ `cargo check` compiles cleanly, including the embedded Python exercise files.
 
-✅ The 10 beginner reference solutions pass their pytest and Ruff checks.
+✅ The 11 beginner reference solutions pass their pytest and Ruff checks.
 
 ⚠️ `cargo run -- dev check --require-solutions` currently stops at
 `exercises/12_testing/testing1.py`: the developer check requires an existing
@@ -103,10 +104,8 @@ all of its test functions.
 
 ### Curriculum Work
 
-- Add `17_packaging` exercises covering `__init__.py`, relative imports, and
-  `pyproject.toml`.
 - Add mixed-topic quizzes between curriculum sections.
-- Expand the one-exercise advanced sections where additional practice is useful.
+- Expand sections where additional practice is useful.
 
 ### Polish
 
