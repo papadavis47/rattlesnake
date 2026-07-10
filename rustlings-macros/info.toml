@@ -149,6 +149,15 @@ Store constructor arguments on an object with `self`:
 Instance methods also take `self` as their first parameter and can read those
 attributes to build their return value."""
 
+[[exercises]]
+name = "basics11"
+dir = "00_basics"
+hint = """
+A slice has the form `sequence[start:stop:step]`. The stop index is excluded.
+
+Use `[1:-1]` to omit both ends, `[::2]` to take every other item, and `[::-1]`
+to make a reversed copy without changing the original list."""
+
 # WORKFLOW CHECKPOINT
 
 [[exercises]]
@@ -192,6 +201,18 @@ In modern Python (3.10+), you can use `X | None` instead of `Optional[X]`:
 
 For the `last` parameter, use `str | None = None` to indicate it's optional."""
 
+[[exercises]]
+name = "type_hints3"
+dir = "01_type_hints"
+type_check = true
+hint = """
+Annotate a callable with its parameter and return types:
+
+    operation: Callable[[int], int]
+
+Define `T = TypeVar("T")`, then use `list[T] -> T` so `first` preserves the
+element type for lists of strings, integers, or any other type."""
+
 # DATA STRUCTURES
 
 [[exercises]]
@@ -210,6 +231,18 @@ Dataclasses generate `__init__`, `__repr__`, `__eq__` and more automatically:
 
 The `frozen=True` makes instances immutable (no attribute reassignment)."""
 
+[[exercises]]
+name = "data_structures2"
+dir = "02_data_structures"
+hint = """
+Use `auto()` for each enum member so Python generates unique values:
+
+    class State(Enum):
+        READY = auto()
+
+An enum property can compare the current member by identity, such as
+`self is TrafficLight.GREEN`."""
+
 # COMPREHENSIONS
 
 [[exercises]]
@@ -222,6 +255,16 @@ Dict comprehension:  {key: value for item in iterable}
 Set comprehension:   {expr for item in iterable}
 
 For example: `[x**2 for x in numbers if x % 2 == 0]`"""
+
+[[exercises]]
+name = "comprehensions2"
+dir = "03_comprehensions"
+hint = """
+Nested comprehensions list their loops in the same order as nested `for` loops:
+
+    [value for row in rows for value in row if condition]
+
+Use `value > 0` as the final filter while preserving row and item order."""
 
 # DECORATORS
 
@@ -243,6 +286,16 @@ A decorator is a function that takes a function and returns a new function:
 
 Use `@wraps(func)` from functools to preserve the original function's
 name and docstring."""
+
+[[exercises]]
+name = "decorators2"
+dir = "04_decorators"
+hint = """
+A parameterized decorator has three layers: `repeat(times)`, a decorator that
+accepts the function, and a wrapper that accepts `*args, **kwargs`.
+
+Call the function inside `for _ in range(times)`, retain the last result, and
+decorate the wrapper with `@wraps(function)` before returning it."""
 
 # CONTEXT MANAGERS
 
@@ -280,6 +333,18 @@ manager as a generator function:
 Everything before `yield` is `__enter__`, and the `finally` block is `__exit__`.
 Save the original `sys.stdout`, replace it, yield, then restore it."""
 
+[[exercises]]
+name = "context_managers3"
+dir = "05_context_managers"
+hint = """
+`ExitStack` collects context managers dynamically and closes them in reverse
+order when its `with` block ends:
+
+    with ExitStack() as stack:
+        values = [stack.enter_context(resource) for resource in resources]
+
+Return the collected values from inside the block; cleanup still runs."""
+
 # OOP
 
 [[exercises]]
@@ -313,6 +378,15 @@ and pass along `**kwargs` so the MRO chain isn't broken:
 
 The key insight: `super()` doesn't call the parent — it calls the *next class
 in the MRO*. Pass named arguments as keyword arguments through `**kwargs`."""
+
+[[exercises]]
+name = "oop3"
+dir = "06_oop"
+hint = """
+Composition stores another object rather than inheriting from its class.
+
+Assign `self.engine = engine` in `Car.__init__`, then delegate work by calling
+`self.engine.start()` when building the car's start message."""
 
 # ITERATORS AND GENERATORS
 
@@ -354,6 +428,14 @@ For Fibonacci, keep two variables `a, b = 0, 1` and swap: `a, b = b, a + b`.
             else:
                 yield item"""
 
+[[exercises]]
+name = "iterators3"
+dir = "07_iterators_generators"
+hint = """
+`chain(intro, cycle(loop))` produces the intro once and then repeats the loop.
+Because `cycle` is infinite, wrap that iterator with `islice(..., total)` and
+convert the finite slice to a list."""
+
 # DESCRIPTORS AND PROPERTIES
 
 [[exercises]]
@@ -375,6 +457,15 @@ Properties use decorators to make methods look like attributes:
 A read-only property just omits the setter. Use `self.celsius = celsius`
 in `__init__` (not `self._celsius`) to trigger the validation."""
 
+[[exercises]]
+name = "descriptors1"
+dir = "08_descriptors_properties"
+hint = """
+`__set_name__` receives the managed attribute name; save a private name such as
+`f"_{name}"`. In `__get__`, return the descriptor when `instance is None`, or
+read the private attribute. In `__set__`, validate first and then use `setattr`
+to store the value under that private name."""
+
 # ERROR HANDLING
 
 [[exercises]]
@@ -394,6 +485,19 @@ Custom exceptions inherit from Exception (or a custom base):
 
 Use `data.get("name")` to check for missing or empty fields."""
 
+[[exercises]]
+name = "error_handling2"
+dir = "09_error_handling"
+hint = """
+An `ExceptionGroup` can contain unrelated exception types. Use separate clauses:
+
+    except* ValueError as group:
+        ...
+    except* TypeError as group:
+        ...
+
+Each clause receives only its matching subgroup in `group.exceptions`."""
+
 # CONCURRENCY
 
 [[exercises]]
@@ -411,6 +515,17 @@ in threads:
         results = list(executor.map(func, iterable))
 
 `executor.map()` preserves input order and blocks until all results are ready."""
+
+[[exercises]]
+name = "concurrency2"
+dir = "10_concurrency"
+hint = """
+Create one `Lock` per counter and guard the complete read-modify-write operation:
+
+    with self.lock:
+        self.value += amount
+
+The lock ensures only one worker can update the shared value at a time."""
 
 # ASYNC
 
@@ -430,6 +545,18 @@ To run multiple coroutines concurrently, use `asyncio.gather`:
     results = await asyncio.gather(coro1(), coro2(), coro3())
 
 `asyncio.gather` returns results in the same order as the input coroutines."""
+
+[[exercises]]
+name = "async2"
+dir = "11_async"
+hint = """
+An asynchronous generator uses `yield` inside `async def`. Yield each number
+after `await asyncio.sleep(0)`. Consume it with:
+
+    async for number in count_up(limit):
+        values.append(number)
+
+Return the completed list after the loop."""
 
 # TESTING
 
@@ -453,6 +580,17 @@ Use `@pytest.mark.parametrize` to test multiple inputs:
         assert calc.add(a, b) == expected
 
 Use `pytest.approx()` for floating-point comparisons."""
+
+[[exercises]]
+name = "testing2"
+dir = "12_testing"
+hint = """
+Patch the name looked up by `weather_report`, not an external implementation:
+
+    with patch(f"{__name__}.fetch_temperature", return_value=12) as mocked:
+        assert weather_report("Oslo") == "Oslo: 12°C"
+
+After the block, assert the mock was called once with `"Oslo"`."""
 
 # FUNCTOOLS AND CLOSURES
 
@@ -478,6 +616,19 @@ A closure captures variables from its enclosing scope:
         if n < 2: return n
         return fib(n-1) + fib(n-2)"""
 
+[[exercises]]
+name = "functools2"
+dir = "13_functools_closures"
+hint = """
+Register implementations on the generic function with `@describe.register`.
+The annotation on each registered function's argument selects its dispatch type:
+
+    @describe.register
+    def _(value: int) -> str:
+        ...
+
+Add another registration for `list`. Other types use the default function."""
+
 # PATTERN MATCHING
 
 [[exercises]]
@@ -502,6 +653,20 @@ For dict matching:
         case _:
             raise ValueError(...)"""
 
+[[exercises]]
+name = "pattern_matching2"
+dir = "14_pattern_matching"
+hint = """
+Dataclasses support positional class patterns through their generated
+`__match_args__`:
+
+    case Point(0, 0):
+        return "origin"
+    case Point(x, y):
+        ...
+
+Match the special origin case before the general point case."""
+
 # METACLASSES
 
 [[exercises]]
@@ -519,6 +684,15 @@ hint = """
 This is much simpler than writing a custom metaclass and covers
 most registration/validation use cases."""
 
+[[exercises]]
+name = "metaclasses2"
+dir = "15_metaclasses"
+hint = """
+Inside metaclass `__new__`, inspect `namespace.get("__annotations__", {})`.
+Build a tuple of names that do not start with `_`, assign it to
+`namespace["fields"]`, then call `super().__new__(mcls, name, bases, namespace)`
+to create the class."""
+
 # PROTOCOLS AND ABCs
 
 [[exercises]]
@@ -535,3 +709,36 @@ hint = """
 
 Any class with a `draw() -> str` method satisfies `Drawable` — no
 inheritance needed! Use `@runtime_checkable` to enable `isinstance()` checks."""
+
+[[exercises]]
+name = "protocols2"
+dir = "16_protocols_abcs"
+type_check = true
+hint = """
+Use a covariant type variable for the read-only protocol:
+
+    T_co = TypeVar("T_co", covariant=True)
+    class Readable(Protocol[T_co]):
+        def read(self) -> T_co: ...
+
+A consumer preserves the concrete result type with:
+
+    def read_first(source: Readable[T]) -> T:
+        return source.read()
+
+`Box(Generic[T])` satisfies the protocol structurally without inheriting from
+it."""
+
+# PACKAGING
+
+[[exercises]]
+name = "packaging1"
+dir = "17_packaging"
+hint = """
+`tomllib.loads` accepts a string, while the provided TOML is bytes. Decode it,
+parse it, and select the standardized project metadata table:
+
+    document = tomllib.loads(source.decode())
+    return document["project"]
+
+No temporary files are needed."""
