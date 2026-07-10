@@ -563,6 +563,7 @@ Return the completed list after the loop."""
 [[exercises]]
 name = "testing1"
 dir = "12_testing"
+learner_writes_tests = true
 hint = """
 Pytest fixtures provide test setup:
 

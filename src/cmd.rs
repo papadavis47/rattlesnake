@@ -81,7 +81,7 @@ impl CmdRunner {
             .arg(exercise_path)
             .arg("-v")
             .arg("--tb=short")
-            .arg("--color=always")
+            .arg("--color=yes")
             .arg("--no-header")
             .arg("-q");
 

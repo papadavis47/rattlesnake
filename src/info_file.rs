@@ -25,6 +25,10 @@ pub struct ExerciseInfo {
     /// The exercise is already solved. Ignore it when checking that all exercises are unsolved.
     #[serde(default)]
     pub skip_check_unsolved: bool,
+    /// The learner writes this exercise's tests, so the file legitimately has no
+    /// `def test_` yet. Skip the "`test = true` requires tests" check in `dev check`.
+    #[serde(default)]
+    pub learner_writes_tests: bool,
 }
 const fn default_true() -> bool {
     true

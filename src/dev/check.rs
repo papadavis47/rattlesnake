@@ -81,9 +81,9 @@ fn check_info_file_exercises(info_file: &InfoFile) -> Result<HashSet<PathBuf>> {
 
         let contains_tests = file_buf.contains("def test_");
         if exercise_info.test {
-            if !contains_tests {
+            if !contains_tests && !exercise_info.learner_writes_tests {
                 bail!(
-                    "The file `{path}` doesn't contain any tests. If you don't want to add tests to this exercise, set `test = false` for this exercise in the `info.toml` file"
+                    "The file `{path}` doesn't contain any tests. If you don't want to add tests to this exercise, set `test = false` for this exercise in the `info.toml` file. If the learner is meant to write the tests, set `learner_writes_tests = true`"
                 );
             }
         } else if contains_tests {

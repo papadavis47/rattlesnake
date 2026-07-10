@@ -95,10 +95,13 @@ exercise has an inline hint in `info.toml` and a corresponding solution.
 
 ✅ The 11 beginner reference solutions pass their pytest and Ruff checks.
 
-⚠️ `cargo run -- dev check --require-solutions` currently stops at
-`exercises/12_testing/testing1.py`: the developer check requires an existing
-`def test_` function, but that exercise intentionally asks the learner to write
-all of its test functions.
+✅ `dev check`'s test-detection rule no longer blocks `testing1.py`. Exercises
+where the learner writes the tests set `learner_writes_tests = true` in
+`info.toml` to opt out of the "`test = true` requires `def test_`" check.
+
+ℹ️ Running `dev check` requires the exercise tools (`pytest`, `ruff`, `ty`)
+resolvable via `uv run` — i.e. a `pyproject.toml` like the one `init` generates.
+The repo doesn't commit one, so run `dev check` from an initialized tree.
 
 ## Remaining Work
 
@@ -109,8 +112,10 @@ all of its test functions.
 
 ### Polish
 
-- Fix the `dev check` test-detection rule so `testing1.py` can intentionally ask
-  learners to create the tests.
+- `type_hints2.py`'s intended fix is purely type annotations, but its `info.toml`
+  entry doesn't set `type_check = true`, so the unsolved stub passes run/pytest/ruff
+  and `dev check` flags it "already solved." Enable `type_check` (and confirm `ty`
+  fails on the unsolved version) or add a runtime-failing assertion.
 - `exercises/README.md` still contains the upstream Rust exercise map and needs updating.
 - `dev-Cargo.toml` still contains the upstream Rust exercise bin list and can be removed.
 - Integration test names such as `run_compilation_success` still reflect Rust
@@ -127,5 +132,6 @@ test = true                 # Run pytest (default: true)
 type_check = false          # Run ty check (default: false)
 lint = true                 # Run ruff check (default: true)
 skip_check_unsolved = false # Skip "already solved" check (default: false)
+learner_writes_tests = false # Exempt from "test=true needs def test_" (default: false)
 hint = """..."""             # Hint shown on `h` keypress
 ```
