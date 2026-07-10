@@ -1,6 +1,6 @@
 # Rattlesnake
 
-![Rattlesnake logo](images/rattlesnake-logo.png)
+![Rattlesnake logo](images/rattlesnake-logo-readme.png)
 
 **Learn Python by fixing code, running tests, and getting immediate feedback.**
 
