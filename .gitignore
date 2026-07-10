@@ -20,3 +20,6 @@ __pycache__/
 
 # Ignore file for editors like Helix
 .ignore
+
+# learning notes
+learning/

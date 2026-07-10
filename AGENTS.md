@@ -2,7 +2,16 @@
 
 ## What Is This?
 
-Rattlesnake is a fork of [Rustlings](https://github.com/rust-lang/rustlings) repurposed to teach **intermediate-to-advanced Python** using the same Rust CLI infrastructure. The Rust TUI (watch mode, file-change detection, progress tracking) is preserved; only the exercise runner and content have been swapped to Python.
+Rattlesnake is a fork of [Rustlings](https://github.com/rust-lang/rustlings) repurposed to teach **Python from beginner syntax through advanced concepts** using the same Rust CLI infrastructure. The Rust TUI (watch mode, file-change detection, progress tracking) is preserved; the exercise runner and curriculum use Python.
+
+## Learning Notes
+
+The root-level `learning/` directory is reserved for the user's personal learning
+notes and is intentionally ignored by Git. When the user asks to preserve notes
+or learning material for later study, create Markdown files in `learning/`
+unless they specify another location. Create the directory if it does not yet
+exist. Do not place project documentation there because its contents are not
+version-controlled.
 
 ## Toolchain
 
@@ -48,50 +57,65 @@ Each exercise goes through up to 4 stages (configurable per-exercise in `info.to
 - **`tests/integration_tests.rs`** — Updated binary name reference, directory names.
 - **`tests/test_exercises/`** — Converted from Rust to Python exercise files.
 
-### Exercise Content (Phase 5 — Initial Set ✅)
+### Exercise Content (Phase 5 — 32 Exercises ✅)
 
-Created 7 exercises across 5 sections in `exercises/` with matching `solutions/`:
+The current curriculum has 32 exercises across 18 sections, with a matching
+file in `solutions/` for every exercise:
 
-| Section                 | Exercises                           |
-|-------------------------|-------------------------------------|
-| `00_intro`              | `intro1.py`, `intro2.py`            |
-| `01_type_hints`         | `type_hints1.py`, `type_hints2.py`  |
-| `02_data_structures`    | `data_structures1.py`               |
-| `03_comprehensions`     | `comprehensions1.py`                |
-| `04_decorators`         | `decorators1.py`                    |
+| Section                        | Exercises                                      |
+|--------------------------------|------------------------------------------------|
+| `00_basics`                    | `basics1.py` through `basics10.py`             |
+| `00_intro`                     | `intro1.py`, `intro2.py`                       |
+| `01_type_hints`                | `type_hints1.py`, `type_hints2.py`             |
+| `02_data_structures`           | `data_structures1.py`                          |
+| `03_comprehensions`            | `comprehensions1.py`                           |
+| `04_decorators`                | `decorators1.py`                               |
+| `05_context_managers`          | `context_managers1.py`, `context_managers2.py` |
+| `06_oop`                       | `oop1.py`, `oop2.py`                           |
+| `07_iterators_generators`      | `iterators1.py`, `iterators2.py`               |
+| `08_descriptors_properties`    | `properties1.py`                               |
+| `09_error_handling`            | `error_handling1.py`                           |
+| `10_concurrency`               | `concurrency1.py`                              |
+| `11_async`                     | `async1.py`                                    |
+| `12_testing`                   | `testing1.py`                                  |
+| `13_functools_closures`        | `functools1.py`                                |
+| `14_pattern_matching`          | `pattern_matching1.py`                         |
+| `15_metaclasses`               | `metaclasses1.py`                              |
+| `16_protocols_abcs`            | `protocols1.py`                                |
 
-All exercises defined in `rustlings-macros/info.toml` with hints.
+Exercise order and configuration are defined in `rustlings-macros/info.toml`,
+not by directory name. The 10 beginner exercises are presented first, followed
+by the workflow checkpoint and the intermediate-to-advanced curriculum. Every
+exercise has an inline hint in `info.toml` and a corresponding solution.
 
 ### Build Status
 
-✅ `cargo build` compiles cleanly.
+✅ `cargo check` compiles cleanly, including the embedded Python exercise files.
+
+✅ The 10 beginner reference solutions pass their pytest and Ruff checks.
+
+⚠️ `cargo run -- dev check --require-solutions` currently stops at
+`exercises/12_testing/testing1.py`: the developer check requires an existing
+`def test_` function, but that exercise intentionally asks the learner to write
+all of its test functions.
 
 ## Remaining Work
 
-### More Exercises Needed (Phase 5 continued)
+### Curriculum Work
 
-The following sections from the curriculum plan still need exercises written:
-
-- `05_context_managers` — `__enter__`/`__exit__`, `@contextmanager`
-- `06_oop` — Inheritance, MRO, `super()`, ABC, protocols
-- `07_iterators_generators` — `__iter__`/`__next__`, `yield`, `yield from`, `itertools`
-- `08_descriptors_properties` — `@property`, custom descriptors
-- `09_error_handling` — Custom exceptions, exception groups, `match`/`case`
-- `10_concurrency` — `threading`, `concurrent.futures`, GIL
-- `11_async` — `async`/`await`, `asyncio`, tasks
-- `12_testing` — `pytest` fixtures, parametrize, mocking
-- `13_functools_closures` — `partial`, `lru_cache`, closures, `nonlocal`
-- `14_pattern_matching` — Structural pattern matching
-- `15_metaclasses` — `__new__` vs `__init__`, `type()`, `__init_subclass__`
-- `16_protocols_abcs` — `typing.Protocol`, structural subtyping
-- `17_packaging` — `__init__.py`, relative imports, `pyproject.toml`
-- `quizzes/` — Mixed-topic quizzes between sections
+- Add `17_packaging` exercises covering `__init__.py`, relative imports, and
+  `pyproject.toml`.
+- Add mixed-topic quizzes between curriculum sections.
+- Expand the one-exercise advanced sections where additional practice is useful.
 
 ### Polish
 
-- Integration tests need updating for Python exercise semantics (the current Rust integration tests reference Cargo-based compilation patterns).
-- README.md needs full rewrite for Rattlesnake.
-- `dev-Cargo.toml` can be cleaned up or removed.
+- Fix the `dev check` test-detection rule so `testing1.py` can intentionally ask
+  learners to create the tests.
+- `exercises/README.md` still contains the upstream Rust exercise map and needs updating.
+- `dev-Cargo.toml` still contains the upstream Rust exercise bin list and can be removed.
+- Integration test names such as `run_compilation_success` still reflect Rust
+  terminology even though their fixtures now use Python.
 - Consider adding `ruff format --check` as an optional formatting stage.
 
 ## `info.toml` Exercise Schema
