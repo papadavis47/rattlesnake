@@ -1,4 +1,5 @@
-# Welcome to Rattlesnake! This exercise already works.
+# TODO: No code changes are needed for this checkpoint.
+# Your beginner warm-up is complete! This exercise already works.
 # Press `n` in the terminal to move to the next exercise.
 
 print(r"""
@@ -9,8 +10,8 @@ print(r"""
 /_/ |_|\__,_/\__/  \__/_/\___/____/_/ /_/\__,_/_/|_|\___/ 
 """)
 
-print("Welcome to Rattlesnake! 🐍")
-print("This is an interactive tool to learn intermediate and advanced Python.")
+print("Python basics complete! 🐍")
+print("Next, Rattlesnake will introduce intermediate and advanced Python.")
 print()
 print("The file for this exercise is `exercises/00_intro/intro1.py`.")
 print("The current exercise path will always be shown under the progress bar.")

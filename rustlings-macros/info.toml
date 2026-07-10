@@ -3,8 +3,8 @@ format_version = 1
 welcome_message = """
 Welcome to Rattlesnake! 🐍
 
-Rattlesnake is an interactive tool for learning intermediate and advanced
-Python. Unlike typical beginner tutorials, we start where they leave off.
+Rattlesnake is an interactive tool for learning Python, from the basic syntax
+through intermediate and advanced concepts.
 
 How it works:
 1. Each exercise contains a `# TODO` comment explaining what to fix or implement.
@@ -30,7 +30,126 @@ and more.
 Keep practicing and consider contributing your own exercises!
 https://github.com/papadavis47/rattlesnake"""
 
-# INTRO
+# PYTHON BASICS
+
+[[exercises]]
+name = "basics1"
+dir = "00_basics"
+hint = """
+Assign the text `Hello, Python!` to `message`.
+
+Strings are surrounded by quotes:
+
+    message = "Hello, Python!"
+
+The `print(message)` line will display its value."""
+
+[[exercises]]
+name = "basics2"
+dir = "00_basics"
+hint = """
+Variables are created by assigning values with `=`:
+
+    notebooks = 4
+    price = 2.5
+
+Multiply them with `*` and assign the result to `total`."""
+
+[[exercises]]
+name = "basics3"
+dir = "00_basics"
+hint = """
+An f-string inserts expressions inside braces:
+
+    greeting = f"Hello, {name}!"
+
+Use both `name` and `language` in the requested sentence."""
+
+[[exercises]]
+name = "basics4"
+dir = "00_basics"
+hint = """
+Use `if`, `elif`, and `else` to choose one result:
+
+    if condition:
+        return "first result"
+    elif other_condition:
+        return "second result"
+    else:
+        return "fallback result"
+
+Check the freezing range first, then the hot range."""
+
+[[exercises]]
+name = "basics5"
+dir = "00_basics"
+hint = """
+List items are ordered and indexed starting at zero:
+
+    colors = ["red", "blue"]
+    first = colors[0]
+
+Add an item with `colors.append("green")`."""
+
+[[exercises]]
+name = "basics6"
+dir = "00_basics"
+hint = """
+A `for` loop visits every item in a collection:
+
+    total = 0
+    for number in numbers:
+        total += number
+
+Return the total after the loop has finished."""
+
+[[exercises]]
+name = "basics7"
+dir = "00_basics"
+hint = """
+Define parameters inside the parentheses and use `return` to send back a value:
+
+    def multiply(left, right):
+        return left * right
+
+This function needs to add its two arguments instead."""
+
+[[exercises]]
+name = "basics8"
+dir = "00_basics"
+hint = """
+Dictionaries map keys to values:
+
+    person = {"name": "Ada", "age": 36}
+
+Read a value with `person["name"]` and add one with
+`person["language"] = "Python"`."""
+
+[[exercises]]
+name = "basics9"
+dir = "00_basics"
+hint = """
+A `while` loop repeats as long as its condition is true:
+
+    while current > 0:
+        values.append(current)
+        current -= 1
+
+Remember to change `current` each time so the loop eventually stops."""
+
+[[exercises]]
+name = "basics10"
+dir = "00_basics"
+hint = """
+Store constructor arguments on an object with `self`:
+
+    def __init__(self, name):
+        self.name = name
+
+Instance methods also take `self` as their first parameter and can read those
+attributes to build their return value."""
+
+# WORKFLOW CHECKPOINT
 
 [[exercises]]
 name = "intro1"
