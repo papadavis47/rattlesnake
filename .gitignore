@@ -4,10 +4,12 @@ Cargo.lock
 !/Cargo.lock
 
 # State file
-.rustlings-state.txt
+.rattlesnake-state.txt
 
 # Python
 __pycache__/
+.venv/
+*.pyc
 
 # OS
 .DS_Store

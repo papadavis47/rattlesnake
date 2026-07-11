@@ -1,0 +1,23 @@
+[project]
+name = "rattlesnake-exercises"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0",
+    "ruff>=0.11",
+    "ty>=0.0",
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+# The generics exercises teach classic `TypeVar` and explicit variance, which
+# these rules would push toward PEP 695 native syntax.
+ignore = ["UP046", "UP047"]
+
+[tool.pytest.ini_options]
+testpaths = ["exercises"]
