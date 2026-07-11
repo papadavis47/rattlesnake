@@ -112,6 +112,31 @@ Notes on how this was reached:
 - The ruff config ignores `UP046`/`UP047` because the generics exercises teach
   classic `TypeVar` and explicit variance rather than PEP 695 syntax.
 
+### Polish (Phase 6 ✅)
+
+- Migrated every `pyproject.toml` template — the root file, the `init.rs`
+  `PYPROJECT_TOML`, and the `dev/new.rs` `PYPROJECT_TOML` (community projects) —
+  from the deprecated `[tool.uv] dev-dependencies` to PEP 735
+  `[dependency-groups] dev = [...]`. `uv sync`/`uv run` no longer warn.
+- Rewrote `exercises/README.md`: replaced the upstream Rust→book map with a
+  Python section→topic map (each section pointing at the relevant official docs).
+- Removed the vestigial `dev/Cargo.toml` and its `dev-Cargo.toml` symlink
+  (nothing reads them — `dev new` writes a `pyproject.toml`). Also dropped the
+  now-empty `build.rs` (its only job was the Windows symlink copy) and the
+  `/dev-Cargo.toml` package `include` entry, and fixed the stale `dev update`
+  doc comment.
+- Renamed the Rust-flavored integration tests/fixtures: `run_compilation_*`
+  → `run_execution_*`, and the `compilation_*` fixtures → `execution_*` (file +
+  `info.toml` + fixture message). Also removed the fragile leading newline from
+  the `run_test_success` stdout assertion (it only matched on a cold `uv run`).
+- Added an optional `ruff format --check` stage, gated by a per-exercise
+  `format` field in `info.toml` (default `false`). Runs after lint, before the
+  type check. Verified end-to-end: a mis-formatted file fails the stage, a
+  formatted one passes.
+- Renamed `dev/rustlings-repo.txt` → `dev/rattlesnake-repo.txt` so the in-repo
+  old-method guard in `main.rs` actually fires (the name mismatch meant it never
+  did), and updated `Cargo.toml` `authors`/`repository` to the Rattlesnake fork.
+
 ## Remaining Work
 
 ### Curriculum Work
@@ -121,28 +146,6 @@ Notes on how this was reached:
 - Consider a dedicated PEP 695 generics exercise (`def first[T]`, `class Box[T]`)
   so learners see both classic `TypeVar` and the modern native syntax. If added,
   don't ignore `UP046`/`UP047` for it (see the ruff note under Toolchain).
-
-### Polish
-
-- ✅ Migrated every `pyproject.toml` template — the root file, the `init.rs`
-  `PYPROJECT_TOML`, and the `dev/new.rs` `PYPROJECT_TOML` (community projects) —
-  from the deprecated `[tool.uv] dev-dependencies` to PEP 735
-  `[dependency-groups] dev = [...]`. `uv sync`/`uv run` no longer warn.
-- ✅ Rewrote `exercises/README.md`: replaced the upstream Rust→book map with a
-  Python section→topic map (each section pointing at the relevant official docs).
-- ✅ Removed the vestigial `dev/Cargo.toml` and its `dev-Cargo.toml` symlink
-  (nothing reads them — `dev new` writes a `pyproject.toml`). Also dropped the
-  now-empty `build.rs` (its only job was the Windows symlink copy) and the
-  `/dev-Cargo.toml` package `include` entry, and fixed the stale `dev update`
-  doc comment.
-- ✅ Renamed the Rust-flavored integration tests/fixtures: `run_compilation_*`
-  → `run_execution_*`, and the `compilation_*` fixtures → `execution_*` (file +
-  `info.toml` + fixture message). Also removed the fragile leading newline from
-  the `run_test_success` stdout assertion (it only matched on a cold `uv run`).
-- ✅ Added an optional `ruff format --check` stage, gated by a per-exercise
-  `format` field in `info.toml` (default `false`). Runs after lint, before the
-  type check. Verified end-to-end: a mis-formatted file fails the stage, a
-  formatted one passes.
 
 ## `info.toml` Exercise Schema
 
