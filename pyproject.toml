@@ -3,8 +3,8 @@ name = "rattlesnake-exercises"
 version = "0.1.0"
 requires-python = ">=3.12"
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.0",
     "ruff>=0.11",
     "ty>=0.0",

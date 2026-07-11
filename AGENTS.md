@@ -123,9 +123,9 @@ Notes on how this was reached:
 
 ### Polish
 
-- The `pyproject.toml` and the `init.rs` template use `tool.uv.dev-dependencies`,
-  which uv now deprecates (warns on every `uv run`). Migrate both to
-  `[dependency-groups]` `dev = [...]`.
+- ✅ Migrated the root `pyproject.toml` and the `init.rs` `PYPROJECT_TOML`
+  template from the deprecated `[tool.uv] dev-dependencies` to PEP 735
+  `[dependency-groups] dev = [...]`. `uv sync`/`uv run` no longer warn.
 - `exercises/README.md` still contains the upstream Rust exercise map and needs updating.
 - `dev/Cargo.toml` (via the `dev-Cargo.toml` symlink) still contains the upstream
   Rust exercise bin list and can be removed.
