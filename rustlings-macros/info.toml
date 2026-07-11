@@ -194,6 +194,7 @@ This doesn't change how the function runs — it's metadata for tools and reader
 [[exercises]]
 name = "type_hints2"
 dir = "01_type_hints"
+type_check = true
 hint = """
 In modern Python (3.10+), you can use `X | None` instead of `Optional[X]`:
 

@@ -39,7 +39,7 @@ def test_rectangle_area():
 def test_cannot_instantiate_shape():
     try:
         Shape()
-        assert False, "Should not be able to instantiate an abstract class"
+        raise AssertionError("Should not be able to instantiate an abstract class")
     except TypeError:
         pass
 

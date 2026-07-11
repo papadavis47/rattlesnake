@@ -95,13 +95,21 @@ exercise has an inline hint in `info.toml` and a corresponding solution.
 
 ✅ The 11 beginner reference solutions pass their pytest and Ruff checks.
 
-✅ `dev check`'s test-detection rule no longer blocks `testing1.py`. Exercises
-where the learner writes the tests set `learner_writes_tests = true` in
-`info.toml` to opt out of the "`test = true` requires `def test_`" check.
+✅ `cargo run -- dev check` (and `--require-solutions`) passes end-to-end and is
+idempotent — all 49 unsolved exercises fail as expected and all 50 solutions pass
+their enabled stages. The repo commits a dev `pyproject.toml`/`.python-version`
+so `uv run` resolves `pytest`/`ruff`/`ty` in-place (mirrors what `init` generates).
 
-ℹ️ Running `dev check` requires the exercise tools (`pytest`, `ruff`, `ty`)
-resolvable via `uv run` — i.e. a `pyproject.toml` like the one `init` generates.
-The repo doesn't commit one, so run `dev check` from an initialized tree.
+Notes on how this was reached:
+- Exercises where the learner writes the tests set `learner_writes_tests = true`
+  in `info.toml` to opt out of the "`test = true` requires `def test_`" check
+  (`testing1`).
+- `run_pytest` uses `--color=yes` (current pytest rejects `always`) and commands
+  run with `PYTHONDONTWRITEBYTECODE=1` so exercise runs don't litter `__pycache__`.
+- `type_hints2` sets `type_check = true` (its fix is purely type annotations);
+  `comprehensions1`'s stub returns placeholders so it fails until solved.
+- The ruff config ignores `UP046`/`UP047` because the generics exercises teach
+  classic `TypeVar` and explicit variance rather than PEP 695 syntax.
 
 ## Remaining Work
 
@@ -112,10 +120,6 @@ The repo doesn't commit one, so run `dev check` from an initialized tree.
 
 ### Polish
 
-- `type_hints2.py`'s intended fix is purely type annotations, but its `info.toml`
-  entry doesn't set `type_check = true`, so the unsolved stub passes run/pytest/ruff
-  and `dev check` flags it "already solved." Enable `type_check` (and confirm `ty`
-  fails on the unsolved version) or add a runtime-failing assertion.
 - `exercises/README.md` still contains the upstream Rust exercise map and needs updating.
 - `dev-Cargo.toml` still contains the upstream Rust exercise bin list and can be removed.
 - Integration test names such as `run_compilation_success` still reflect Rust

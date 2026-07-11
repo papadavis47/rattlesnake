@@ -39,6 +39,6 @@ def test_countdown_is_iterator():
     assert next(c) == 1
     try:
         next(c)
-        assert False, "Should raise StopIteration"
+        raise AssertionError("Should raise StopIteration")
     except StopIteration:
         pass

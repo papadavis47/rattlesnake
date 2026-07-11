@@ -4,30 +4,33 @@
 
 def squares_of_evens(numbers: list[int]) -> list[int]:
     """Return squares of even numbers from the input list."""
-    # TODO: Replace with a list comprehension
-    result = []
-    for n in numbers:
-        if n % 2 == 0:
-            result.append(n ** 2)
-    return result
+    # TODO: Return a list comprehension equivalent to this loop:
+    #   result = []
+    #   for n in numbers:
+    #       if n % 2 == 0:
+    #           result.append(n ** 2)
+    #   return result
+    return []
 
 
 def invert_dict(d: dict[str, int]) -> dict[int, str]:
     """Swap keys and values in a dictionary."""
-    # TODO: Replace with a dict comprehension
-    result = {}
-    for k, v in d.items():
-        result[v] = k
-    return result
+    # TODO: Return a dict comprehension equivalent to this loop:
+    #   result = {}
+    #   for k, v in d.items():
+    #       result[v] = k
+    #   return result
+    return {}
 
 
 def unique_lengths(words: list[str]) -> set[int]:
     """Return the set of unique word lengths."""
-    # TODO: Replace with a set comprehension
-    result = set()
-    for w in words:
-        result.add(len(w))
-    return result
+    # TODO: Return a set comprehension equivalent to this loop:
+    #   result = set()
+    #   for w in words:
+    #       result.add(len(w))
+    #   return result
+    return set()
 
 
 def test_squares_of_evens():

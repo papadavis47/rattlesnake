@@ -68,6 +68,6 @@ def test_triangle_area():
 def test_unknown_shape():
     try:
         classify_shape({"type": "hexagon"})
-        assert False, "Should raise ValueError"
+        raise AssertionError("Should raise ValueError")
     except ValueError:
         pass

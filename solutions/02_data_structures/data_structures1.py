@@ -19,7 +19,7 @@ def test_point_frozen():
     p = Point(1.0, 2.0)
     try:
         p.x = 5.0
-        assert False, "Should not be able to modify a frozen dataclass"
+        raise AssertionError("Should not be able to modify a frozen dataclass")
     except AttributeError:
         pass
 

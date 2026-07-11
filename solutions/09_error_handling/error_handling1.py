@@ -37,7 +37,7 @@ def test_valid_user():
 def test_missing_name():
     try:
         validate_user({"email": "a@b.com"})
-        assert False, "Should raise MissingFieldError"
+        raise AssertionError("Should raise MissingFieldError")
     except MissingFieldError as e:
         assert e.field == "name"
 
@@ -45,7 +45,7 @@ def test_missing_name():
 def test_missing_email():
     try:
         validate_user({"name": "Alice"})
-        assert False, "Should raise MissingFieldError"
+        raise AssertionError("Should raise MissingFieldError")
     except MissingFieldError as e:
         assert e.field == "email"
 
@@ -53,7 +53,7 @@ def test_missing_email():
 def test_invalid_email_format():
     try:
         validate_user({"name": "Alice", "email": "not-an-email"})
-        assert False, "Should raise InvalidFormatError"
+        raise AssertionError("Should raise InvalidFormatError")
     except InvalidFormatError as e:
         assert e.field == "email"
         assert e.expected_format == "user@domain.com"

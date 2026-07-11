@@ -7,6 +7,10 @@ use std::{
 /// Run a command with a description for a possible error and append the merged stdout and stderr.
 /// The boolean in the returned `Result` is true if the command's exit status is success.
 fn run_cmd(mut cmd: Command, description: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+    // Don't let Python litter the exercise directories with `__pycache__`, which
+    // would trip the `dev check` unexpected-files check on the next run.
+    cmd.env("PYTHONDONTWRITEBYTECODE", "1");
+
     let spawn = |mut cmd: Command| {
         // NOTE: The closure drops `cmd` which prevents a pipe deadlock.
         cmd.stdin(Stdio::null())

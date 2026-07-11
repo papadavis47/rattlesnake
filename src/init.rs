@@ -144,6 +144,9 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+# The generics exercises teach classic `TypeVar` and explicit variance, which
+# these rules would push toward PEP 695 native syntax.
+ignore = ["UP046", "UP047"]
 
 [tool.pytest.ini_options]
 testpaths = ["exercises"]
