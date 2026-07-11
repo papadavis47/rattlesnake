@@ -22,7 +22,7 @@ pub enum DevCommand {
         #[arg(short, long)]
         require_solutions: bool,
     },
-    /// Update the `Cargo.toml` file for the exercises
+    /// Validate `info.toml` for the exercises
     Update,
 }
 

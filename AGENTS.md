@@ -128,8 +128,11 @@ Notes on how this was reached:
   `[dependency-groups] dev = [...]`. `uv sync`/`uv run` no longer warn.
 - ✅ Rewrote `exercises/README.md`: replaced the upstream Rust→book map with a
   Python section→topic map (each section pointing at the relevant official docs).
-- `dev/Cargo.toml` (via the `dev-Cargo.toml` symlink) still contains the upstream
-  Rust exercise bin list and can be removed.
+- ✅ Removed the vestigial `dev/Cargo.toml` and its `dev-Cargo.toml` symlink
+  (nothing reads them — `dev new` writes a `pyproject.toml`). Also dropped the
+  now-empty `build.rs` (its only job was the Windows symlink copy) and the
+  `/dev-Cargo.toml` package `include` entry, and fixed the stale `dev update`
+  doc comment.
 - Integration test names such as `run_compilation_success` still reflect Rust
   terminology even though their fixtures now use Python.
 - Consider adding `ruff format --check` as an optional formatting stage.
