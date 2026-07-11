@@ -147,7 +147,7 @@ pub trait RunnableExercise {
 
         // 5. Run ty if type_check=true.
         if self.type_check() {
-            let type_success = cmd_runner.run_ty(exercise_path, output.as_deref_mut())?;
+            let type_success = cmd_runner.run_ty(exercise_path, output)?;
             if !type_success {
                 return Ok(false);
             }
