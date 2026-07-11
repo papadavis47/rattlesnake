@@ -1,13 +1,13 @@
 format_version = 1
 
 [[exercises]]
-name = "compilation_success"
+name = "execution_success"
 test = false
 lint = false
 hint = ""
 
 [[exercises]]
-name = "compilation_failure"
+name = "execution_failure"
 test = false
 lint = false
 hint = ""

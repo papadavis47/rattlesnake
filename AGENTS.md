@@ -133,8 +133,10 @@ Notes on how this was reached:
   now-empty `build.rs` (its only job was the Windows symlink copy) and the
   `/dev-Cargo.toml` package `include` entry, and fixed the stale `dev update`
   doc comment.
-- Integration test names such as `run_compilation_success` still reflect Rust
-  terminology even though their fixtures now use Python.
+- ✅ Renamed the Rust-flavored integration tests/fixtures: `run_compilation_*`
+  → `run_execution_*`, and the `compilation_*` fixtures → `execution_*` (file +
+  `info.toml` + fixture message). Also removed the fragile leading newline from
+  the `run_test_success` stdout assertion (it only matched on a cold `uv run`).
 - Consider adding `ruff format --check` as an optional formatting stage.
 
 ## `info.toml` Exercise Schema

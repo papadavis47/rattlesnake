@@ -75,18 +75,18 @@ impl<'a> Cmd<'a> {
 }
 
 #[test]
-fn run_compilation_success() {
+fn run_execution_success() {
     Cmd::default()
         .current_dir("tests/test_exercises")
-        .args(&["run", "compilation_success"])
+        .args(&["run", "execution_success"])
         .success();
 }
 
 #[test]
-fn run_compilation_failure() {
+fn run_execution_failure() {
     Cmd::default()
         .current_dir("tests/test_exercises")
-        .args(&["run", "compilation_failure"])
+        .args(&["run", "execution_failure"])
         .fail();
 }
 
@@ -95,7 +95,7 @@ fn run_test_success() {
     Cmd::default()
         .current_dir("tests/test_exercises")
         .args(&["run", "test_success"])
-        .output(PartialStdout("\nOutput from `main` function\n"))
+        .output(PartialStdout("Output from `main` function\n"))
         .success();
 }
 
