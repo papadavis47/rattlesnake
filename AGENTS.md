@@ -126,7 +126,8 @@ Notes on how this was reached:
 - ✅ Migrated the root `pyproject.toml` and the `init.rs` `PYPROJECT_TOML`
   template from the deprecated `[tool.uv] dev-dependencies` to PEP 735
   `[dependency-groups] dev = [...]`. `uv sync`/`uv run` no longer warn.
-- `exercises/README.md` still contains the upstream Rust exercise map and needs updating.
+- ✅ Rewrote `exercises/README.md`: replaced the upstream Rust→book map with a
+  Python section→topic map (each section pointing at the relevant official docs).
 - `dev/Cargo.toml` (via the `dev-Cargo.toml` symlink) still contains the upstream
   Rust exercise bin list and can be removed.
 - Integration test names such as `run_compilation_success` still reflect Rust
