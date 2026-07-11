@@ -117,11 +117,18 @@ Notes on how this was reached:
 
 - Add mixed-topic quizzes between curriculum sections.
 - Expand sections where additional practice is useful.
+- Consider a dedicated PEP 695 generics exercise (`def first[T]`, `class Box[T]`)
+  so learners see both classic `TypeVar` and the modern native syntax. If added,
+  don't ignore `UP046`/`UP047` for it (see the ruff note under Toolchain).
 
 ### Polish
 
+- The `pyproject.toml` and the `init.rs` template use `tool.uv.dev-dependencies`,
+  which uv now deprecates (warns on every `uv run`). Migrate both to
+  `[dependency-groups]` `dev = [...]`.
 - `exercises/README.md` still contains the upstream Rust exercise map and needs updating.
-- `dev-Cargo.toml` still contains the upstream Rust exercise bin list and can be removed.
+- `dev/Cargo.toml` (via the `dev-Cargo.toml` symlink) still contains the upstream
+  Rust exercise bin list and can be removed.
 - Integration test names such as `run_compilation_success` still reflect Rust
   terminology even though their fixtures now use Python.
 - Consider adding `ruff format --check` as an optional formatting stage.
