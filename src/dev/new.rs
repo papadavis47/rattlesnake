@@ -113,6 +113,9 @@ name = "???"
 # Run linting on the exercise (default is `true`).
 # lint = true
 
+# Check formatting on the exercise with `ruff format --check` (default is `false`).
+# format = false
+
 # A multi-line hint to be shown to users on request.
 hint = """???"""
 "#;
@@ -122,8 +125,8 @@ name = "rattlesnake-exercises"
 version = "0.1.0"
 requires-python = ">=3.12"
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.0",
     "ruff>=0.11",
     "ty>=0.0",

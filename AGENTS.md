@@ -124,8 +124,9 @@ Notes on how this was reached:
 
 ### Polish
 
-- ✅ Migrated the root `pyproject.toml` and the `init.rs` `PYPROJECT_TOML`
-  template from the deprecated `[tool.uv] dev-dependencies` to PEP 735
+- ✅ Migrated every `pyproject.toml` template — the root file, the `init.rs`
+  `PYPROJECT_TOML`, and the `dev/new.rs` `PYPROJECT_TOML` (community projects) —
+  from the deprecated `[tool.uv] dev-dependencies` to PEP 735
   `[dependency-groups] dev = [...]`. `uv sync`/`uv run` no longer warn.
 - ✅ Rewrote `exercises/README.md`: replaced the upstream Rust→book map with a
   Python section→topic map (each section pointing at the relevant official docs).
