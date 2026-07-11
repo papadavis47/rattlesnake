@@ -17,6 +17,15 @@ use crate::{
 };
 
 pub fn init() -> Result<()> {
+    // Guard against re-initializing from inside an existing Rattlesnake project,
+    // which would otherwise create a nested `rattlesnake/rattlesnake/`.
+    if Path::new("exercises").is_dir()
+        && Path::new("solutions").is_dir()
+        && Path::new("pyproject.toml").is_file()
+    {
+        bail!(RATTLESNAKE_ALREADY_INITIALIZED_ERR);
+    }
+
     let rattlesnake_dir = Path::new("rattlesnake");
     if rattlesnake_dir.exists() {
         bail!(RATTLESNAKE_DIR_ALREADY_EXISTS_ERR);
@@ -163,6 +172,10 @@ const RATTLESNAKE_DIR_ALREADY_EXISTS_ERR: &str =
 You probably already initialized Rattlesnake.
 Run `cd rattlesnake`
 Then run `rattlesnake` again";
+
+const RATTLESNAKE_ALREADY_INITIALIZED_ERR: &str =
+    "Rattlesnake is already initialized in the current directory.
+Run `rattlesnake` to get started.";
 
 const POST_INIT_MSG: &[u8] = b"Run `cd rattlesnake` to go into the generated directory.
 Then run `rattlesnake` to get started.
