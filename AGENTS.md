@@ -26,13 +26,14 @@ Exercises are validated using the **Astral** stack, invoked via `uv run`:
 
 ## Exercise Validation Pipeline
 
-Each exercise goes through up to 4 stages (configurable per-exercise in `info.toml`):
+Each exercise goes through up to 5 stages (configurable per-exercise in `info.toml`):
 
 ```
-1. uv run python <exercise>.py     → runs without error?
-2. uv run pytest <exercise>.py     → tests pass?          (if test = true)
-3. uv run ruff check <exercise>.py → no lint violations?  (if lint = true)
-4. uv run ty check <exercise>.py   → no type errors?      (if type_check = true)
+1. uv run python <exercise>.py            → runs without error?
+2. uv run pytest <exercise>.py            → tests pass?          (if test = true)
+3. uv run ruff check <exercise>.py        → no lint violations?  (if lint = true)
+4. uv run ruff format --check <exercise>.py → formatted?         (if format = true)
+5. uv run ty check <exercise>.py          → no type errors?      (if type_check = true)
 ```
 
 ## Completed Work
@@ -137,7 +138,10 @@ Notes on how this was reached:
   → `run_execution_*`, and the `compilation_*` fixtures → `execution_*` (file +
   `info.toml` + fixture message). Also removed the fragile leading newline from
   the `run_test_success` stdout assertion (it only matched on a cold `uv run`).
-- Consider adding `ruff format --check` as an optional formatting stage.
+- ✅ Added an optional `ruff format --check` stage, gated by a per-exercise
+  `format` field in `info.toml` (default `false`). Runs after lint, before the
+  type check. Verified end-to-end: a mis-formatted file fails the stage, a
+  formatted one passes.
 
 ## `info.toml` Exercise Schema
 
@@ -148,6 +152,7 @@ dir = "01_type_hints"       # Subdirectory (optional)
 test = true                 # Run pytest (default: true)
 type_check = false          # Run ty check (default: false)
 lint = true                 # Run ruff check (default: true)
+format = false              # Run ruff format --check (default: false)
 skip_check_unsolved = false # Skip "already solved" check (default: false)
 learner_writes_tests = false # Exempt from "test=true needs def test_" (default: false)
 hint = """..."""             # Hint shown on `h` keypress

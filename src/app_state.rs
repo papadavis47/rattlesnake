@@ -118,6 +118,7 @@ impl AppState {
                     test: exercise_info.test,
                     type_check: exercise_info.type_check,
                     lint: exercise_info.lint,
+                    format: exercise_info.format,
                     hint: exercise_info.hint.trim_ascii(),
                     // Updated below.
                     done: false,
@@ -618,6 +619,7 @@ mod tests {
             test: false,
             type_check: false,
             lint: false,
+            format: false,
             hint: "",
             done: false,
         }

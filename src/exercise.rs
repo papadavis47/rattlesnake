@@ -42,6 +42,7 @@ pub struct Exercise {
     pub test: bool,
     pub type_check: bool,
     pub lint: bool,
+    pub format: bool,
     pub hint: &'static str,
     pub done: bool,
 }
@@ -68,6 +69,7 @@ pub trait RunnableExercise {
     fn test(&self) -> bool;
     fn type_check(&self) -> bool;
     fn lint(&self) -> bool;
+    fn format(&self) -> bool;
 
     fn exercise_path(&self) -> String {
         let name = self.name();
@@ -135,7 +137,15 @@ pub trait RunnableExercise {
             }
         }
 
-        // 4. Run ty if type_check=true.
+        // 4. Check formatting with ruff if format=true.
+        if self.format() {
+            let format_success = cmd_runner.run_ruff_format(exercise_path, output.as_deref_mut())?;
+            if !format_success {
+                return Ok(false);
+            }
+        }
+
+        // 5. Run ty if type_check=true.
         if self.type_check() {
             let type_success = cmd_runner.run_ty(exercise_path, output.as_deref_mut())?;
             if !type_success {
@@ -205,5 +215,9 @@ impl RunnableExercise for Exercise {
 
     fn lint(&self) -> bool {
         self.lint
+    }
+
+    fn format(&self) -> bool {
+        self.format
     }
 }

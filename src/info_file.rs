@@ -20,6 +20,9 @@ pub struct ExerciseInfo {
     /// Run linting on the exercise.
     #[serde(default = "default_true")]
     pub lint: bool,
+    /// Check formatting on the exercise with `ruff format --check`.
+    #[serde(default)]
+    pub format: bool,
     /// The exercise's hint to be shown to the user on request.
     pub hint: &'static str,
     /// The exercise is already solved. Ignore it when checking that all exercises are unsolved.
@@ -49,6 +52,10 @@ impl RunnableExercise for ExerciseInfo {
 
     fn lint(&self) -> bool {
         self.lint
+    }
+
+    fn format(&self) -> bool {
+        self.format
     }
 
     fn test(&self) -> bool {

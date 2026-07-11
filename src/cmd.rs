@@ -105,6 +105,23 @@ impl CmdRunner {
         run_cmd(cmd, &format!("uv run ruff check {exercise_path}"), output)
     }
 
+    /// Check formatting of a Python exercise file via `uv run ruff format --check <exercise_path>`.
+    /// The boolean in the returned `Result` is true if the command's exit status is success.
+    pub fn run_ruff_format(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+        let mut cmd = Command::new("uv");
+        cmd.arg("run")
+            .arg("ruff")
+            .arg("format")
+            .arg("--check")
+            .arg(exercise_path);
+
+        run_cmd(
+            cmd,
+            &format!("uv run ruff format --check {exercise_path}"),
+            output,
+        )
+    }
+
     /// Run ty type checker on a Python exercise file via `uv run ty check <exercise_path>`.
     /// The boolean in the returned `Result` is true if the command's exit status is success.
     pub fn run_ty(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
