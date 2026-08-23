@@ -173,14 +173,14 @@ pub fn watch(
 }
 
 const QUIT_MSG: &[u8] = b"q\n
-We hope you're enjoying learning Rust!
-If you want to continue working on the exercises at a later point, you can simply run `rustlings` again in this directory.
+We hope you're enjoying learning Python!
+If you want to continue working on the exercises at a later point, you can simply run `rattlesnake` again in this directory.
 ";
 
 const NOTIFY_ERR: &str = "
 The automatic detection of exercise file changes failed :(
-Please try running `rustlings` again.
+Please try running `rattlesnake` again.
 
-If you keep getting this error, run `rustlings --manual-run` to deactivate the file watcher.
+If you keep getting this error, run `rattlesnake --manual-run` to deactivate the file watcher.
 You need to manually trigger running the current exercise using `r` then.
 ";
