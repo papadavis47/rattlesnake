@@ -10,6 +10,9 @@ fn run_cmd(mut cmd: Command, description: &str, output: Option<&mut Vec<u8>>) ->
     // Don't let Python litter the exercise directories with `__pycache__`, which
     // would trip the `dev check` unexpected-files check on the next run.
     cmd.env("PYTHONDONTWRITEBYTECODE", "1");
+    // Output goes through a pipe, where Python on Windows falls back to the
+    // locale encoding (e.g. cp1252) and crashes on characters like emoji.
+    cmd.env("PYTHONUTF8", "1");
 
     let spawn = |mut cmd: Command| {
         // NOTE: The closure drops `cmd` which prevents a pipe deadlock.

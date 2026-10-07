@@ -107,7 +107,8 @@ Notes on how this was reached:
   in `info.toml` to opt out of the "`test = true` requires `def test_`" check
   (`testing1`).
 - `run_pytest` uses `--color=yes` (current pytest rejects `always`) and commands
-  run with `PYTHONDONTWRITEBYTECODE=1` so exercise runs don't litter `__pycache__`.
+  run with `PYTHONDONTWRITEBYTECODE=1` so exercise runs don't litter `__pycache__`,
+  and `PYTHONUTF8=1` so piped output doesn't crash on emoji under Windows cp1252.
 - `type_hints2` sets `type_check = true` (its fix is purely type annotations);
   `comprehensions1`'s stub returns placeholders so it fails until solved.
 - The ruff config ignores `UP046`/`UP047` because the generics exercises teach
