@@ -186,8 +186,8 @@ fn main() -> Result<ExitCode> {
 }
 
 const OLD_METHOD_ERR: &str =
-    "You are trying to run Rattlesnake using the old method before version 6.
-The new method doesn't include cloning the Rattlesnake repository.
+    "You are trying to run Rattlesnake from inside its source repository.
+Exercises should be set up in a separate directory with `rattlesnake init`.
 Please follow the instructions in `README.md`:
 https://github.com/papadavis47/rattlesnake#getting-started";
 

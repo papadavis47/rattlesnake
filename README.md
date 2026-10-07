@@ -134,8 +134,10 @@ project mark unless a different format is required.
 ## Acknowledgements
 
 Rattlesnake is built on the excellent
-[Rustlings](https://github.com/rust-lang/rustlings) project and preserves much
-of its CLI architecture and interactive learning experience.
+[Rustlings](https://github.com/rust-lang/rustlings) project (forked from
+v6.5.0) and preserves much of its CLI architecture and interactive learning
+experience. Rattlesnake is versioned independently, starting at 0.1.0; upstream
+release notes are archived in [`CHANGELOG-rustlings.md`](CHANGELOG-rustlings.md).
 
 ## License
 
