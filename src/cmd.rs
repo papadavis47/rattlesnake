@@ -107,7 +107,11 @@ impl CmdRunner {
 
     /// Check formatting of a Python exercise file via `uv run ruff format --check <exercise_path>`.
     /// The boolean in the returned `Result` is true if the command's exit status is success.
-    pub fn run_ruff_format(&self, exercise_path: &str, output: Option<&mut Vec<u8>>) -> Result<bool> {
+    pub fn run_ruff_format(
+        &self,
+        exercise_path: &str,
+        output: Option<&mut Vec<u8>>,
+    ) -> Result<bool> {
         let mut cmd = Command::new("uv");
         cmd.arg("run")
             .arg("ruff")

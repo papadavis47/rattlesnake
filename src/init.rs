@@ -40,9 +40,7 @@ pub fn init() -> Result<()> {
         .context("Failed to run the command `uv --version`")?
         .success()
     {
-        bail!(
-            "uv is required. Install it from https://docs.astral.sh/uv/"
-        )
+        bail!("uv is required. Install it from https://docs.astral.sh/uv/")
     }
 
     let mut stdout = io::stdout().lock();

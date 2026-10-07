@@ -114,7 +114,8 @@ pub trait RunnableExercise {
             if let Some(output) = output {
                 write_ansi(output, SetAttribute(Attribute::Bold));
                 write_ansi(output, SetForegroundColor(Color::Red));
-                output.extend_from_slice(b"The exercise didn't run successfully (nonzero exit code)");
+                output
+                    .extend_from_slice(b"The exercise didn't run successfully (nonzero exit code)");
                 write_ansi(output, ResetColor);
                 output.push(b'\n');
             }
@@ -139,7 +140,8 @@ pub trait RunnableExercise {
 
         // 4. Check formatting with ruff if format=true.
         if self.format() {
-            let format_success = cmd_runner.run_ruff_format(exercise_path, output.as_deref_mut())?;
+            let format_success =
+                cmd_runner.run_ruff_format(exercise_path, output.as_deref_mut())?;
             if !format_success {
                 return Ok(false);
             }

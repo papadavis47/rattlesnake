@@ -185,8 +185,7 @@ fn main() -> Result<ExitCode> {
     Ok(ExitCode::SUCCESS)
 }
 
-const OLD_METHOD_ERR: &str =
-    "You are trying to run Rattlesnake from inside its source repository.
+const OLD_METHOD_ERR: &str = "You are trying to run Rattlesnake from inside its source repository.
 Exercises should be set up in a separate directory with `rattlesnake init`.
 Please follow the instructions in `README.md`:
 https://github.com/papadavis47/rattlesnake#getting-started";
