@@ -39,13 +39,17 @@ def test_fetch_all_results():
 
 def test_fetch_all_concurrent():
     """Verify that tasks run concurrently, not sequentially."""
-    items = [("a", 0.05), ("b", 0.05), ("c", 0.05)]
+    items = [("a", 0.1), ("b", 0.1), ("c", 0.1)]
 
     import time
 
-    start = time.perf_counter()
-    asyncio.run(fetch_all(items))
-    elapsed = time.perf_counter() - start
+    async def timed_fetch_all() -> float:
+        # Time inside the event loop so loop startup isn't counted.
+        start = time.perf_counter()
+        await fetch_all(items)
+        return time.perf_counter() - start
 
-    # If run concurrently: ~0.05s. If sequential: ~0.15s.
-    assert elapsed < 0.12
+    elapsed = asyncio.run(timed_fetch_all())
+
+    # If run concurrently: ~0.1s. If sequential: at least 0.3s.
+    assert elapsed < 0.25
