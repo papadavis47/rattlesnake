@@ -28,7 +28,7 @@ Exercises are validated using the **Astral** stack, invoked via `uv run`:
 
 Each exercise goes through up to 5 stages (configurable per-exercise in `info.toml`):
 
-```
+```text
 1. uv run python <exercise>.py            → runs without error?
 2. uv run pytest <exercise>.py            → tests pass?          (if test = true)
 3. uv run ruff check <exercise>.py        → no lint violations?  (if lint = true)
@@ -102,6 +102,7 @@ their enabled stages. The repo commits a dev `pyproject.toml`/`.python-version`
 so `uv run` resolves `pytest`/`ruff`/`ty` in-place (mirrors what `init` generates).
 
 Notes on how this was reached:
+
 - Exercises where the learner writes the tests set `learner_writes_tests = true`
   in `info.toml` to opt out of the "`test = true` requires `def test_`" check
   (`testing1`).

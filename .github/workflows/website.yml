@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - website
+      - website/**
       - .github/workflows/website.yml
 
 jobs:
@@ -47,4 +47,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v5

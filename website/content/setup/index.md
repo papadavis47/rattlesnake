@@ -4,11 +4,15 @@ title = "Setup"
 
 <!-- toc -->
 
-## Installing Rust
+## Prerequisites
 
-Before installing Rustlings, you must have the **latest version of Rust** installed.
-Visit [www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install) for further instructions.
-This will also install _Cargo_, Rust's package/project manager.
+Rattlesnake is a Rust program that runs Python exercises, so you need two tools:
+
+- **Rust** (1.88 or newer) to build and install Rattlesnake.
+  Visit [www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install) for instructions.
+  This also installs _Cargo_, Rust's package manager.
+- **[uv](https://docs.astral.sh/uv/getting-started/installation/)** to manage Python and the exercise tools.
+  You don't need to install Python yourself: `uv` downloads Python 3.12 if needed.
 
 > 🐧 If you are on **Linux**, make sure you have `gcc` installed (_for a linker_).
 >
@@ -17,62 +21,68 @@ This will also install _Cargo_, Rust's package/project manager.
 
 > 🍎 If you are on **MacOS**, make sure you have _Xcode and its developer tools_ installed: `xcode-select --install`
 
-## Installing Rustlings
+## Installing Rattlesnake
 
-The following command will download and compile Rustlings:
+Clone the repository and install the CLI from source:
 
 ```bash
-cargo install rustlings
+git clone https://github.com/papadavis47/rattlesnake.git
+cargo install --path rattlesnake
 ```
 
 {% details(summary="If the installation fails…") %}
 
 - Make sure you have the latest Rust version by running `rustup update`
-- Try adding the `--locked` flag: `cargo install rustlings --locked`
-- Otherwise, please [report the issue](https://github.com/rust-lang/rustlings/issues/new)
+- Try adding the `--locked` flag: `cargo install --path rattlesnake --locked`
+- Otherwise, please [report the issue](https://github.com/papadavis47/rattlesnake/issues/new)
 
 {% end %}
 
 ## Initialization
 
-After installing Rustlings, run the following command to initialize the `rustlings/` directory:
+From the directory where you want to keep your exercises, run:
 
 ```bash
-rustlings init
+rattlesnake init
 ```
 
-{% details(summary="If the command <code>rustlings</code> can't be found…") %}
+This creates a `rattlesnake/` directory with the exercises, a `pyproject.toml`, and a `.python-version` file.
+It then runs `uv sync` to install [pytest](https://pytest.org), [Ruff](https://docs.astral.sh/ruff/), and [ty](https://docs.astral.sh/ty/) into a local virtual environment.
 
-You are probably using Linux and installed Rust using your package manager.
+{% details(summary="If the command <code>rattlesnake</code> can't be found…") %}
 
 Cargo installs binaries to the directory `~/.cargo/bin`.
-Sadly, package managers often don't add `~/.cargo/bin` to your `PATH` environment variable.
+If you installed Rust with a package manager, `~/.cargo/bin` might not be in your `PATH` environment variable.
 
 - Either add `~/.cargo/bin` manually to `PATH`
 - Or uninstall Rust from the package manager and [install it using the official way with `rustup`](https://www.rust-lang.org/tools/install)
 
 {% end %}
 
-Now, go into the newly initialized directory and launch Rustlings for further instructions on getting started with the exercises:
+Now, go into the newly initialized directory and launch Rattlesnake:
 
 ```bash
-cd rustlings/
-rustlings
+cd rattlesnake/
+rattlesnake
 ```
 
 ## Working environment
 
 ### Editor
 
-Our general recommendation is [VS Code](https://code.visualstudio.com/) with the [rust-analyzer plugin](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
-But any editor that supports [rust-analyzer](https://rust-analyzer.github.io/) should be enough for working on the exercises.
+Any editor with good Python support works.
+[VS Code](https://code.visualstudio.com/) with the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) is a solid choice.
+Point your editor at the `.venv/` directory inside `rattlesnake/` so it finds the installed tools.
+
+When running in a VS Code terminal, Rattlesnake opens the current exercise automatically.
+For other editors, see the `--edit-cmd` option in `rattlesnake --help`.
 
 ### Terminal
 
-While working with Rustlings, please use a modern terminal for the best user experience.
+Please use a modern terminal for the best experience.
 The default terminal on Linux and Mac should be sufficient.
 On Windows, we recommend the [Windows Terminal](https://aka.ms/terminal).
 
 ## Usage
 
-After being done with the setup, visit the [**usage**](@/usage/index.md) page for some info about using Rustlings 🚀
+After setup, visit the [**usage**](@/usage/index.md) page to learn how to work through the exercises 🚀
