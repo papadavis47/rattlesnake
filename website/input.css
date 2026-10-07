@@ -43,6 +43,16 @@
   blockquote {
     @apply px-3 pt-2 pb-px mb-4 mt-2 border-s-4 border-white/80 bg-white/7 rounded-sm;
   }
+  table {
+    @apply block overflow-x-auto mt-2 mb-4 border-collapse;
+  }
+  th,
+  td {
+    @apply px-3 py-1.5 border border-white/20 text-left;
+  }
+  th {
+    @apply bg-white/10;
+  }
 
   pre {
     @apply px-2 pt-2 pb-1.5 overflow-x-auto text-sm sm:text-base rounded-sm mt-2 mb-4 selection:bg-white/15;
