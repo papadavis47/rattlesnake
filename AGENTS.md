@@ -101,6 +101,9 @@ idempotent — all 49 unsolved exercises fail as expected and all 50 solutions p
 their enabled stages. The repo commits a dev `pyproject.toml`/`.python-version`
 so `uv run` resolves `pytest`/`ruff`/`ty` in-place (mirrors what `init` generates).
 
+✅ CI (`.github/workflows/rust.yml`) is green on Ubuntu, Windows, and macOS:
+clippy, rustfmt, `cargo test`, `dev check --require-solutions`, and rumdl.
+
 Notes on how this was reached:
 
 - Exercises where the learner writes the tests set `learner_writes_tests = true`
@@ -139,7 +142,63 @@ Notes on how this was reached:
   old-method guard in `main.rs` actually fires (the name mismatch meant it never
   did), and updated `Cargo.toml` `authors`/`repository` to the Rattlesnake fork.
 
+### Versioning, Website & CI (Phase 7 ✅)
+
+- **Independent versioning.** Rattlesnake is versioned on its own, starting at
+  `0.1.0` (workspace `version` + the `=0.1.0` pin on `rustlings-macros` in
+  `Cargo.toml`). Upstream history lives in `CHANGELOG-rustlings.md`; the new
+  `CHANGELOG.md` starts at 0.1.0. The README credits the fork base (Rustlings
+  v6.5.0). The `info.toml` `format_version` is separate and unchanged.
+- **Upstream tags removed.** All 53 Rustlings tags were deleted locally (origin
+  never had them), and `remote.upstream.tagOpt = --no-tags` keeps
+  `git fetch upstream` from restoring them. Don't reuse `v6.x` tag names.
+- **In-repo guard message** in `main.rs` no longer references Rustlings'
+  "before version 6" history; it tells users to run `rattlesnake init` elsewhere.
+- **Website** (`website/`, Zola + Tailwind) rebranded: `config.toml` points at
+  `https://papadavis47.github.io/rattlesnake` and the fork's repo, changelog,
+  license, and issues; Ferris/Rust images replaced by
+  `static/images/rattlesnake_logo.png` (circular crop of
+  `images/rattlesnake-logo.png`; the vector SVG is black-only and invisible on
+  the dark theme). Footer says "Based on Rustlings". Homepage, Setup, Usage,
+  and Community Exercises pages rewritten for the Python/uv pipeline.
+  `input.css` gained table styles; the 404 logo uses `object-contain` (the
+  global `img` width rule otherwise stretches it).
+- **GitHub Pages** enabled with GitHub Actions as the build source.
+  `website.yml` path filters fixed (`website` → `website/**`, which never
+  matched folder changes) and the deploy step got `id: deployment`.
+- **Workflows on a fork.** The GitHub repo is a fork of `rust-lang/rustlings`,
+  so Actions had to be enabled manually in the Actions tab before push
+  triggers would run.
+- **Check workflow (`rust.yml`)** now passes on Ubuntu, Windows, and macOS:
+  - Same `website/**` path-ignore fix.
+  - `astral-sh/setup-uv@v10.1.0` added to `test` and `dev-check` (runners
+    don't ship `uv`). setup-uv has no floating major tags from v8 on; pin an
+    exact release.
+  - `dev-check` runs on the full OS matrix, not just Ubuntu.
+  - `cargo fmt --all` applied so the `fmt` job passes.
+  - `rumdl` failures in `AGENTS.md` fixed; `CLAUDE.md` is exempt from MD041
+    in `.rumdl.toml` because it must start with `@AGENTS.md`.
+- **Cross-platform fixes found by the CI matrix:**
+  - Commands run with `PYTHONUTF8=1` (`src/cmd.rs`). Without it, Windows
+    pipes use cp1252 and `intro1`'s 🐍 raised `UnicodeEncodeError`.
+  - `run_test_success` no longer matches a trailing `\n` (Python prints CRLF
+    on Windows).
+  - `async1`'s concurrency test now times inside the event loop with 0.1s
+    delays and a 0.25s cap (was 0.05s/0.12s timed around `asyncio.run`, which
+    flaked at 0.21s on macOS). A sequential solution still fails (≥ 0.3s).
+- **Local venv gotcha.** If the repo directory moves, `.venv` script shebangs
+  break and `uv run pytest` silently falls back to a global `pytest`. Fix with
+  `rm -rf .venv && uv sync`.
+
 ## Remaining Work
+
+### Infrastructure
+
+- `actions/upload-pages-artifact` still pulls a Node 20 action, which GitHub is
+  retiring; bump it when a Node 24 release is available.
+- `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19; watch the first runs after.
+- Optionally ask GitHub Support to detach the repo from the Rustlings fork
+  network.
 
 ### Curriculum Work
 
