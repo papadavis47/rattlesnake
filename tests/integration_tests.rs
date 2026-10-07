@@ -95,7 +95,7 @@ fn run_test_success() {
     Cmd::default()
         .current_dir("tests/test_exercises")
         .args(&["run", "test_success"])
-        .output(PartialStdout("Output from `main` function\n"))
+        .output(PartialStdout("Output from `main` function"))
         .success();
 }
 
